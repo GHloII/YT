@@ -16,8 +16,36 @@ button {
     background: none;
 }
 
+/* 
 input:focus,
 button:focus {
     outline: 2px solid #007aff;
     outline-offset: 0;
+} */
+
+button:focus {
+    outline-offset: -4px;
+}
+
+input:focus {
+    outline: none;
+}
+
+
+
+input {
+    width: 100%;
+    padding-left: 0.5em;
+    padding-right: 0.5em;
+    background-color: transparent;
+    font-size: inherit;
+
+    /* Fade only on the right */
+    -webkit-mask-image: linear-gradient(to right, black 0%, black 90%, transparent 100%);
+    -webkit-mask-repeat: no-repeat;
+    -webkit-mask-size: 100% 100%;
+    -webkit-mask-composite: destination-in;
+    mask-image: linear-gradient(to right, black 0%, black 90%, transparent 100%);
+    mask-repeat: no-repeat;
+    mask-size: 100% 100%;
 }
