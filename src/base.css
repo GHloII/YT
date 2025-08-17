@@ -1,0 +1,23 @@
+body,
+input,
+button {
+    font-family: "Inter", sans-serif;
+}
+
+h1 {
+    font-size: 5em;
+    text-align: center;
+    font-weight: 700;
+    padding: 1em 0;
+}
+
+button {
+    border: none;
+    background: none;
+}
+
+input:focus,
+button:focus {
+    outline: 2px solid #007aff;
+    outline-offset: 0;
+}
