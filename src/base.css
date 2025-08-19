@@ -24,6 +24,21 @@ input:focus {
     outline: none;
 }
 
+body {
+    --icon-stroke: rgb(50, 50, 50);
+}
+
+@media(prefers-color-scheme: dark) {
+    body {
+        background-color: black;
+        color: white
+    }
+
+    body {
+        --icon-stroke: white;
+    }
+}
+
 
 
 input {
