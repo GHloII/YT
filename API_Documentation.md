@@ -11,6 +11,7 @@ This document describes the REST API endpoints provided by the YouTube Downloade
 `GET /info`
 
 ### Description
+.
 
 This endpoint allows you to retrieve detailed information about a YouTube video, including its title, available resolutions, thumbnail URL, and format details for various qualities.
 
