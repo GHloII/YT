@@ -1,6 +1,7 @@
 {
   "devDependencies": {
-    "jest": "^30.0.5"
+    "jest": "^30.0.5",
+    "live-server": "^1.2.2"
   },
   "scripts": {
     "test": "jest"
