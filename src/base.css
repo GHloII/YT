@@ -8,7 +8,6 @@ h1 {
     font-size: 5em;
     text-align: center;
     font-weight: 700;
-    padding: 1em 0;
 }
 
 button {
@@ -16,12 +15,6 @@ button {
     background: none;
 }
 
-/* 
-input:focus,
-button:focus {
-    outline: 2px solid #007aff;
-    outline-offset: 0;
-} */
 
 button:focus {
     outline-offset: -4px;
@@ -45,6 +38,7 @@ input {
     -webkit-mask-repeat: no-repeat;
     -webkit-mask-size: 100% 100%;
     -webkit-mask-composite: destination-in;
+    mask-composite: destination-in;
     mask-image: linear-gradient(to right, black 0%, black 90%, transparent 100%);
     mask-repeat: no-repeat;
     mask-size: 100% 100%;
