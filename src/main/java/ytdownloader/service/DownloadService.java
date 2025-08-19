@@ -4,8 +4,6 @@ import org.springframework.stereotype.Service;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.IOException;
-// import java.nio.file.Files; // Удален, так как не используем временные файлы
-// import java.nio.file.Path;   // Удален, так как не используем временные файлы
 import java.util.concurrent.TimeUnit;
 
 @Service
@@ -13,14 +11,7 @@ public class DownloadService {
 
     public void streamVideo(String url, OutputStream output) throws IOException {
         Process process = null;
-        // Path tempFile = null; // Удален
         try {
-            // Удаляем временную строку для печати PATH
-            // System.out.println("PATH from Java application: " + System.getenv("PATH"));
-
-            // Удаляем создание временного файла
-            // tempFile = Files.createTempFile("ytdlp-", ".mp4");
-            // String tempFilePath = tempFile.toAbsolutePath().toString();
 
             ProcessBuilder builder = new ProcessBuilder(
                     "yt-dlp",
@@ -86,15 +77,7 @@ public class DownloadService {
             Thread.currentThread().interrupt();
             throw new IOException("Процесс yt-dlp был прерван.", e);
         } finally {
-            // Удаляем временный файл (если он был создан, но теперь не используется)
-            // if (tempFile != null && Files.exists(tempFile)) {
-            //     try {
-            //         Files.delete(tempFile);
-            //         System.out.println("Временный файл удален: " + tempFile.toString());
-            //     } catch (IOException e) {
-            //         System.err.println("Ошибка при удалении временного файла: " + e.getMessage());
-            //     }
-            // }
+
             if (process != null && process.isAlive()) {
                 destroyProcess(process);
             }

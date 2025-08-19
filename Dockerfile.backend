@@ -1,0 +1,26 @@
+# Dockerfile.backend
+# Используем базовый образ OpenJDK
+FROM openjdk:21-jdk-slim
+
+# Устанавливаем рабочую директорию
+WORKDIR /app
+
+# Устанавливаем ffmpeg и yt-dlp
+# openjdk:21-jdk-slim основан на Debian, поэтому используем apt-get
+RUN apt-get update && apt-get install -y \
+    python3 \
+    python3-pip \
+    ffmpeg \
+    --no-install-recommends && \
+    rm -rf /var/lib/apt/lists/* && \
+    pip3 install yt-dlp
+
+# Копируем JAR-файл вашего Spring Boot приложения
+# После сборки Maven, JAR-фафайл находится в target/
+COPY target/youtube-downloader-0.0.1-SNAPSHOT.jar app.jar
+
+# Определяем порт, который слушает ваше приложение
+EXPOSE 8080
+
+# Запускаем приложение
+ENTRYPOINT ["java", "-jar", "app.jar"]

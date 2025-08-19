@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    ports:
+      - "8080:8080" # Открываем порт для отладки, если нужно прямо к бэкенду
+    # volumes:
+    #   - /tmp/ytdlp_downloads:/app/downloads # Пример монтирования для временных файлов, если понадобится
+
+  nginx:
+    build:
+      context: .
+      dockerfile: Dockerfile.nginx
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    # volumes:
+    #   - ./nginx.conf:/etc/nginx/conf.d/ytdlp.conf:ro # Пример монтирования конфига
+    #   - ./frontend_dist:/usr/share/nginx/html:ro # Пример монтирования статики с хоста

@@ -1,0 +1,18 @@
+# Dockerfile.nginx
+# Используем официальный образ Nginx
+FROM nginx:stable-alpine
+
+# Удаляем стандартную конфигурацию Nginx
+RUN rm /etc/nginx/conf.d/default.conf
+
+# Копируем вашу кастомную конфигурацию Nginx
+COPY nginx.conf /etc/nginx/conf.d/ytdlp.conf
+
+# Копируем собранные фронтенд-файлы в директорию, которую будет обслуживать Nginx
+# Создайте папку 'frontend_dist' в корне вашего проекта и поместите туда 'index.html'
+# или результат сборки вашего фронтенд-проекта (например, папку 'dist')
+COPY frontend_dist /usr/share/nginx/html
+
+EXPOSE 80
+
+CMD ["nginx", "-g", "daemon off;"]
