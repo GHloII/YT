@@ -5,12 +5,42 @@
         href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap"
         rel="stylesheet">
     <link rel="stylesheet" href="base.css">
+    <script src="videoList.js"></script>
+    <script src="downloadVideo.js"></script>
+    <script src="history.js"></script>
+    <script src="videoMetaDataTools.js"></script>
+    <script src="components.js"></script>
+
+    <script>
+        const downloadHistory = new DownloadHistory("downloadHistory")
+        const logoPreviewElement = document.createElement("h1")
+        logoPreviewElement.innerText = "Видео с Ютуба в файл"
+
+        function showPreviewOfCurrentVideo() {
+            const videoURL = document.getElementById("videoURL").value
+            const logoPreview = document.getElementById("logoPreview")
+            getVideoDataFromYoutube(videoURL).then(data => {
+                console.log(data)
+                const videoHTMLElement = videoElement(data.title)
+                console.log(videoHTMLElement, )
+                logoPreview.innerHTML =  data.html
+            }).catch(() => {logoPreview.innerHTML = logoPreviewElement.outerHTML})
+
+        }
+    </script>
 </head>
 
 
 <body>
+    <div id="logoPreview" style="display:flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                height:200px;
+                width: 100%">
+        <h1>Видео с Ютуба в файл</h1>
+    </div>
 
-    <h1>Ютуб и Саундклауд в файл </h1>
     <div style="display:flex;
                 flex-direction: row;
                 justify-content: center;">
@@ -28,7 +58,7 @@
 
 
 
-            <input type="url" placeholder="Ссылка на видео в Ютубе или трек в Саундклауде" style="
+            <input id="videoURL" oninput="showPreviewOfCurrentVideo()" type="text" placeholder="Ссылка на видео" style="
                    border-style: none;
                    border-radius: inherit;
                    padding: 0.1em;
@@ -36,9 +66,9 @@
                    background-color: transparent;
                    font-size: inherit;
                    font-weight:300;
-                   ">
+                   " >
 
-            <button style="
+            <button onclick="DownloadVideo(document.getElementById('videoURL').value, downloadHistory)" style="
                            font-size: inherit;
                            border-radius: inherit;
                            border-width: 0;
@@ -46,7 +76,8 @@
                            height:100%;
                            padding: 0;
                            ">
-                <div style=" font-size: inherit; height:  1em; aspect-ratio: 1/1; margin-left:0.5em; margin-right: 0.5em;">
+                <div
+                    style=" font-size: inherit; height:  1em; aspect-ratio: 1/1; margin-left:0.5em; margin-right: 0.5em;">
 
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="rgb(50,50,50)"
                         stroke-width="1" stroke-linecap="round" stroke-linejoin="round" role="img"
