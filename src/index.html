@@ -5,7 +5,7 @@
         href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap"
         rel="stylesheet">
     <link rel="stylesheet" href="base.css">
-    <script src="videoList.js"></script>
+    <script src="config.js"></script>
     <script src="downloadVideo.js"></script>
     <script src="history.js"></script>
     <script src="videoMetaDataTools.js"></script>
@@ -20,13 +20,12 @@
             const videoURL = document.getElementById("videoURL").value
             const logoPreview = document.getElementById("logoPreview")
             getVideoDataFromYoutube(videoURL).then(data => {
-                console.log(data)
                 const videoHTMLElement = videoElement(data.title)
-                console.log(videoHTMLElement, )
                 logoPreview.innerHTML =  data.html
             }).catch(() => {logoPreview.innerHTML = logoPreviewElement.outerHTML})
 
         }
+
     </script>
 </head>
 
@@ -68,7 +67,7 @@
                    font-weight:300;
                    " >
 
-            <button onclick="DownloadVideo(document.getElementById('videoURL').value, downloadHistory)" style="
+            <button onclick="DownloadWrapper(document.getElementById('videoURL').value, downloadHistory)" style="
                            font-size: inherit;
                            border-radius: inherit;
                            border-width: 0;
