@@ -2,6 +2,10 @@
 
 This document describes the REST API endpoints provided by the YouTube Downloader application.
 
+## Table of Contents
+* [1. Get Video Information](#1-get-video-information)
+* [2. Download Video](#2-download-video)
+
 ---
 
 ## 1. Get Video Information
