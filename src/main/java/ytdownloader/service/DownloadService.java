@@ -27,10 +27,7 @@ public class DownloadService {
                     url
             );
 
-            // // Явно устанавливаем PATH для ProcessBuilder, чтобы yt-dlp нашел ffmpeg
-            // String currentPath = System.getenv("PATH");
-            // String ffmpegPath = "/Users/hlo"; // Путь к директории с ffmpeg
-            // builder.environment().put("PATH", ffmpegPath + ":" + currentPath);
+
 
             process = builder.start(); // Сначала запускаем процесс
 
