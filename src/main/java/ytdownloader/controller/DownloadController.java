@@ -15,19 +15,20 @@ import java.io.IOException;
 public class DownloadController {
 
     private final DownloadService downloadService;
-    private final VideoInfoService videoInfoService;
+    // private final VideoInfoService videoInfoService;
     // private VideoInfo video;
 
     public DownloadController(DownloadService downloadService, VideoInfoService videoInfoService) {
         this.downloadService = downloadService;
-        this.videoInfoService = videoInfoService;
+        // this.videoInfoService = videoInfoService;
     }
 
     @GetMapping("/download")
     public ResponseEntity<String> downloadVideo(
             @RequestParam String url,
-            @RequestParam String videoId, // Добавляем videoId
-            @RequestParam String audioId, // Добавляем audioId
+            @RequestParam(required = false) String videoId, // Добавляем videoId
+            @RequestParam(required = false) String audioId, // Добавляем audioId
+            @RequestParam(required = false) long size, // Добавляем size
             HttpServletResponse response
     ) throws IOException {
 
@@ -51,6 +52,9 @@ public class DownloadController {
         // Динамическое определение Content-Type
         response.setContentType("video/mp4");
         response.setHeader("Content-Disposition", "attachment; filename=\"video.mp4\"");
+        if (size > 0) {
+            response.setHeader("Content-Length", String.valueOf(size));
+        }
 
         // Добавляем заголовки длsя потоковой передачи fMP4
         response.setHeader("Accept-Ranges", "bytes");
