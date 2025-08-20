@@ -70,7 +70,6 @@ function thumbnailAndDownloadControls(thumbnailUrl, title, author, qualityOption
 
     const domparser = new DOMParser();
     const elem = domparser.parseFromString(elementText, 'text/html').getElementsByTagName('div')[0]
-    console.log(elem)
     if (elem == null || !(elem instanceof HTMLDivElement)) {
         throw new Error('element is not div')
 
@@ -78,14 +77,11 @@ function thumbnailAndDownloadControls(thumbnailUrl, title, author, qualityOption
 
     if (qualityOptions) {
         const qualitySelect = elem.getElementsByClassName('quality-selector')[0]
-        console.log(qualityOptions)
-        console.log(elem)
         for (const qualityname in qualityOptions) {
             const qualityId = qualityOptions[qualityname]
             const opt = document.createElement('option')
             opt.value = qualityId
             opt.text = qualityname
-            console.log(qualitySelect)
             qualitySelect.appendChild(opt)
         }
     }
@@ -232,7 +228,6 @@ videoURLBar().addEventListener('input', async function () {
     if (videoData) {
         previewContainer().innerHTML = ''
         previewContainer().appendChild(thumbnailAndDownloadControls(videoData.thumbnail, videoData.title, '', videoData.idByQualityName))
-        console.log(previewContainer().firstChild)
         enableDownloadbutton()
     }
 })
