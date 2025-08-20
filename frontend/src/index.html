@@ -1,37 +1,20 @@
 <head>
+    <meta charset="utf-8">
+    <title>Файл с ютуба</title>
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
         href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap"
         rel="stylesheet">
     <link rel="stylesheet" href="base.css">
-    <script src="config.js"></script>
-    <script src="downloadVideo.js"></script>
-    <script src="history.js"></script>
-    <script src="videoMetaDataTools.js"></script>
-    <script src="components.js"></script>
 
-    <script>
-        const downloadHistory = new DownloadHistory("downloadHistory")
-        const logoPreviewElement = document.createElement("h1")
-        logoPreviewElement.innerText = "Видео с Ютуба в файл"
-
-        function showPreviewOfCurrentVideo() {
-            const videoURL = document.getElementById("videoURL").value
-            const logoPreview = document.getElementById("logoPreview")
-            getVideoDataFromYoutube(videoURL).then(data => {
-                const videoHTMLElement = videoElement(data.title)
-                logoPreview.innerHTML =  data.html
-            }).catch(() => {logoPreview.innerHTML = logoPreviewElement.outerHTML})
-
-        }
-
-    </script>
+    <script src="main.js" type="module"></script>
 </head>
 
 
 <body>
-    <div id="logoPreview" style="display:flex;
+    <div id="previewContainer" style="display:flex;
                 flex-direction: column;
                 align-items: center;
                 justify-content: center;
@@ -65,9 +48,9 @@
                    background-color: transparent;
                    font-size: inherit;
                    font-weight:300;
-                   " >
+                   ">
 
-            <button onclick="DownloadWrapper(document.getElementById('videoURL').value, downloadHistory)" style="
+            <button id="downloadButton" style="
                            font-size: inherit;
                            border-radius: inherit;
                            border-width: 0;
