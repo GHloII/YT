@@ -1,1 +1,2 @@
-const VIDEO_SERVER_ADDRESS = '89.208.96.231'
+// @ts-check
+export const VIDEO_SERVER_ADDRESS = location.hostname
