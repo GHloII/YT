@@ -56,7 +56,7 @@ function thumbnailAndDownloadControls(thumbnailUrl, title, author, qualityOption
                 <div id="download-controls">
 
                     <span>Качество: </span>
-                    <select class="quality-selector">
+                    <select class="quality-selector" id="quality-selector">
                     </select>
 
                     <button id="download-button"
@@ -97,8 +97,13 @@ function makeurl(url) {
     return `http://${VIDEO_SERVER_ADDRESS}/download?url=${url}`
 }
 
-async function DownloadVideo(url) {
-    const downloadServiceUrl = makeurl(url)
+function makeurlWithQuality(url, videoQualityId, audioQualityId) {
+    return `http://${VIDEO_SERVER_ADDRESS}/download?url=${url}&videoId=${videoQualityId}&audioId=${audioQualityId}`
+}
+
+async function DownloadVideo(url, videoQualityId) {
+    // const downloadServiceUrl = videoQualityId? makeurlWithQuality(url,videoQualityId, 'bestaudio'): makeurlWithQuality(url,'bestvideo', 'bestaudio')
+    const downloadServiceUrl =  makeurlWithQuality(url,'bestvideo', 'bestaudio')
 
     const a = document.createElement("a")
     a.href = downloadServiceUrl
@@ -194,6 +199,14 @@ function videoURLBar() {
     return bar
 }
 
+function qualitySelector() {
+    const selector = document.getElementById('quality-selector')
+
+    if (selector == null || !(selector instanceof HTMLSelectElement)) {
+        throw new Error('no quality selector')
+    }
+    return selector
+}
 
 /**
  * 
@@ -217,7 +230,8 @@ function enableDownloadbutton() {
     downloadButton().addEventListener('click',
         function () {
             const url = videoURLBar().value
-            DownloadVideo(url)
+            const videoQualityId = qualitySelector().value
+            DownloadVideo(url, videoQualityId)
             downloadHistory.addItem(url)
         }
     )
@@ -230,6 +244,10 @@ videoURLBar().addEventListener('input', async function () {
         previewContainer().appendChild(thumbnailAndDownloadControls(videoData.thumbnail, videoData.title, '', videoData.idByQualityName))
         enableDownloadbutton()
     }
+})
+
+qualitySelector().addEventListener('change', function() {
+    console.log(qualitySelector().value)
 })
 
 /**
