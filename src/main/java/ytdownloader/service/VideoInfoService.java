@@ -11,10 +11,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream; // Keep if other methods use it, otherwise remove
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map; // Map может быть не нужен, если везде FormatDetails
 import java.util.concurrent.TimeUnit;
 import java.util.StringJoiner;
 

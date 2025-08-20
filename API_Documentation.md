@@ -4,7 +4,7 @@ This document describes the REST API endpoints provided by the YouTube Downloade
 
 ## Table of Contents
 * [1. Get Video Information](#1-get-video-information)
-* [2. Download Video](#2-download-video)
+* [2. Download Video and Audio](#2-download-video-and-audio)
 
 ---
 
@@ -90,7 +90,7 @@ curl -X GET "http://localhost:8080/info?url=https://www.youtube.com/watch?v=dQw4
 }
 ```
 
-## 2. Download Video
+## 2. Download Video and Audio
 
 ### Endpoint
 
@@ -98,22 +98,41 @@ curl -X GET "http://localhost:8080/info?url=https://www.youtube.com/watch?v=dQw4
 
 ### Description
 
-This endpoint allows you to download a YouTube video directly through a stream. The video will be streamed as `video/mp4`.
+This endpoint allows you to download a video or audio stream from YouTube or Soundcloud. The content will be streamed directly.
 
 ### Parameters
 
 | Name | Type | Required | Description |
 |---|---|---|---|
-| `url` | `String` | Yes | The URL of the YouTube video to download. |
+| `url` | `String` | Yes | The URL of the video/audio to download. Only URLs from trusted domains (youtube.com, youtu.be, soundcloud.com) are allowed. |
+| `videoId` | `String` | No | The format ID for the video stream. If provided along with `audioId`, a combined video will be streamed. If only `audioId` is provided, only audio will be streamed. |
+| `audioId` | `String` | No | The format ID for the audio stream. If only `audioId` is provided, only audio will be streamed (as MP3 by default). If provided along with `videoId`, a combined video will be streamed. |
 
-### Response
+### Responses
 
-The video content is streamed directly as a `video/mp4` file. The response headers are set to facilitate streaming and direct download (`Content-Disposition: attachment; filename="video.mp4"`).
+**Successful Responses (HTTP 200 OK):**
 
-### Example
+*   **Video Stream:** The video content is streamed directly as a `video/mp4` file. Response headers are set to facilitate streaming and direct download (`Content-Disposition: attachment; filename="video.mp4"`).
+*   **Audio Stream:** The audio content is streamed directly as an `audio/mpeg` (MP3) file. Response headers are set to facilitate streaming and direct download (`Content-Disposition: attachment; filename="audio.mp3"`).
 
-#### Request
+**Error Responses (HTTP 400 Bad Request / HTTP 500 Internal Server Error):**
+
+*   `HTTP 400 Bad Request`: Returned if neither `videoId` nor `audioId` is provided, or if the `url` is not from a trusted domain.
+    Example Body: `Необходимо указать videoId или audioId для загрузки.`
+    Example Body: `Недоверенный URL.`
+*   `HTTP 500 Internal Server Error`: Returned if an error occurs during the streaming process on the server side (e.g., `yt-dlp` error, `IOException`).
+    Example Body: `Ошибка сервера при загрузке видео.` or `Ошибка сервера при загрузке аудио.`
+
+### Examples
+
+#### 1. Download Video with specific video and audio formats
 
 ```bash
-curl -X GET "http://localhost:8080/download?url=https://www.youtube.com/watch?v=dQw4w9WgXcQ" -o video.mp4
+curl -X GET "http://localhost:8080/download?url=https://www.youtube.com/watch?v=dQw4w9WgXcQ&videoId=248&audioId=251" -o video.mp4
+```
+
+#### 2. Download Audio only
+
+```bash
+curl -X GET "http://localhost:8080/download?url=https://www.youtube.com/watch?v=dQw4w9WgXcQ&audioId=251" -o audio.mp3
 ```
