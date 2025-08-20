@@ -9,7 +9,7 @@ import java.util.concurrent.TimeUnit;
 @Service
 public class DownloadService {
 
-    public void streamVideo(String url, OutputStream output) throws IOException {
+    public void streamVideo(String url, String videoId, String audioId, OutputStream output) throws IOException {
         Process process = null;
         try {
 
@@ -17,13 +17,13 @@ public class DownloadService {
                     "yt-dlp",
                     "--quiet",
                     "--no-progress",
-                    "-f", "bestvideo+bestaudio/best",
+                    "-f", videoId + "+" + audioId, // Используем явно переданные videoId и audioId
                     "--remux-video", "mp4",  // Важно оставить ремуксинг
                     "--downloader", "ffmpeg",
                     "--downloader-args", "ffmpeg:-movflags frag_keyframe+empty_moov -f mp4 -c copy -map 0 -strict experimental -max_muxing_queue_size 9999",
                     "--no-part",
                     "--no-cache-dir",
-                    "-o", "-", // Снова стримим в stdout
+                    "-o", "-",
                     url
             );
 
@@ -74,7 +74,6 @@ public class DownloadService {
             Thread.currentThread().interrupt();
             throw new IOException("Процесс yt-dlp был прерван.", e);
         } finally {
-
             if (process != null && process.isAlive()) {
                 destroyProcess(process);
             }
@@ -83,7 +82,6 @@ public class DownloadService {
 
     private void destroyProcess(Process process) {
         try {
-            // Мягкое завершение
             process.destroy();
 
             // Ожидание завершения
