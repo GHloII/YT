@@ -3,6 +3,8 @@ import { VIDEO_SERVER_ADDRESS } from "./config.js";
 const logoPreviewElement = document.createElement("h1")
 logoPreviewElement.innerText = "Видео с Ютуба в файл"
 
+const previewPlaceholderText = ` <h1 id="preview-placeholder">Видео с Ютуба в файл</h1>`
+
 export class DownloadHistory {
     history = []
     historyLocalStorageName
@@ -20,7 +22,6 @@ export class DownloadHistory {
     saveToLocalStorage() {
         localStorage.setItem(this.historyLocalStorageName, JSON.stringify(this.history))
     }
-
     clear() {
         this.history = []
         this.saveToLocalStorage()
@@ -29,9 +30,71 @@ export class DownloadHistory {
 
 
 
-async function thumbnailElemenet(previewLink, imageWidth, imageHeight) {
-    return `<img src="${previewLink} width=${imageWidth} height=${imageHeight}">`
+/**
+ * @param {string} thumbnailUrl 
+ * @param {string} title 
+ * @param {object} qualityOptions
+ * @returns {HTMLDivElement}
+ */
+function thumbnailAndDownloadControls(thumbnailUrl, title, author, qualityOptions) {
+    const elementText = `<div style="display:flex; flex-direction: row; height: 100%; justify-content: center; gap:1em; max-width: 700px;"
+
+            id="thumbnail-metadata-and-download-controls">
+
+            <div class="thumbnail-container" style="aspect-ratio: 200/113; height: 100%;">
+                <img src="${thumbnailUrl}" alt="Обложка видео"
+                    style="width:100%; height: 100%; object-fit: cover;">
+            </div>
+
+            <div id="meta-data-and-download-controls"
+                style="display: flex; flex-direction: column; justify-content: space-between;">
+
+                <div id="video-meta-data">
+                    <p class="video-title" style="font-size: 1.5em; margin:0">${title}</p>
+                    <p class="video-author" style="margin-top:0.5em">${author}</p>
+                </div>
+                <div id="download-controls">
+
+                    <span>Качество: </span>
+                    <select class="quality-selector">
+                    </select>
+
+                    <button id="download-button"
+                        style="display:block; margin:0; padding:0; margin-top:1em">Скачать</button>
+                </div>
+            </div>
+
+        </div>
+
+`
+
+    const domparser = new DOMParser();
+    const elem = domparser.parseFromString(elementText, 'text/html').getElementsByTagName('div')[0]
+    console.log(elem)
+    if (elem == null || !(elem instanceof HTMLDivElement)) {
+        throw new Error('element is not div')
+
+    }
+
+    if (qualityOptions) {
+        const qualitySelect = elem.getElementsByClassName('quality-selector')[0]
+        console.log(qualityOptions)
+        console.log(elem)
+        for (const qualityname in qualityOptions) {
+            const qualityId = qualityOptions[qualityname]
+            const opt = document.createElement('option')
+            opt.value = qualityId
+            opt.text = qualityname
+            console.log(qualitySelect)
+            qualitySelect.appendChild(opt)
+        }
+    }
+    return elem
 }
+
+
+
+
 
 function makeurl(url) {
     // TODO: replace with https
@@ -89,6 +152,7 @@ async function videoPlayerElement(url) {
 
 /**
  * @param {string} url 
+ * @returns {Promise<{title:string, resolutions:string[], thumbnail:string, sizeByQualityName:object, idByQualityName:object, audioId:string}>}
  */
 export async function getVideoDataFromBackend(url) {
     // TODO: replace with https, sanitize url
@@ -105,6 +169,8 @@ async function videoPlayerFromYoutube(url) {
 }
 
 
+// Element Getters
+
 /**
  * 
  * @returns {HTMLElement}
@@ -117,6 +183,9 @@ function previewContainer() {
     return elem
 }
 
+
+
+
 /**
  * 
  * @returns {HTMLInputElement}
@@ -128,14 +197,15 @@ function videoURLBar() {
     }
     return bar
 }
+
+
 /**
  * 
  * @returns {HTMLButtonElement}
  */
-
 function downloadButton() {
-    const btn = document.getElementById('downloadButton')
-    
+    const btn = document.getElementById('download-button')
+
     if (btn == null || !(btn instanceof HTMLButtonElement)) {
         throw new Error('No download button')
     }
@@ -147,10 +217,36 @@ function downloadButton() {
 const downloadHistory = new DownloadHistory('downloadHistory')
 
 
-downloadButton().addEventListener('click',
-    function () {
-        const url = videoURLBar().value
-        DownloadVideo(url)
-        downloadHistory.addItem(url)
+function enableDownloadbutton() {
+    downloadButton().addEventListener('click',
+        function () {
+            const url = videoURLBar().value
+            DownloadVideo(url)
+            downloadHistory.addItem(url)
+        }
+    )
+}
+
+videoURLBar().addEventListener('input', async function () {
+    const videoData = await getVideoDataFromBackend(videoURLBar().value)
+    if (videoData) {
+        previewContainer().innerHTML = ''
+        previewContainer().appendChild(thumbnailAndDownloadControls(videoData.thumbnail, videoData.title, '', videoData.idByQualityName))
+        console.log(previewContainer().firstChild)
+        enableDownloadbutton()
     }
-)
+})
+
+/**
+ * @returns {HTMLHeadingElement}
+ */
+function previewPlaceholder() {
+    const elem = document.getElementById('preview-placeholder')
+    if (elem == null || !(elem instanceof HTMLHeadingElement)) {
+        throw new Error('no preview placeholder')
+    }
+    return elem
+}
+
+
+
