@@ -2,7 +2,6 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { DownloadVideo } from '@/scripts/utils'
-import { findAncestor } from 'typescript'
 const props = defineProps<{
     title: string
     author?: string
@@ -55,7 +54,13 @@ const size = computed(function (): number {
                 </div>
                 <label for="size">Размер{{ `)))` }} </label>
 
-                <input id="size" type="text" placeholder="байтов" v-model="sizefield" />
+                <input
+                    id="size"
+                    type="text"
+                    placeholder="байтов"
+                    v-model="sizefield"
+                    style="border-style: solid; border-width: 1px; border-radius: 0.5em"
+                />
                 <button
                     v-if="videoUrl"
                     :disabled="!size"
