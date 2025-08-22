@@ -21,25 +21,10 @@ services:
       - "80:80" # Маппинг порта хоста 80 на внутренний порт контейнера Nginx 80
     depends_on:
       - backend
-      - frontend-builder
     networks:
       - app-network
-    volumes:
-      - frontend-dist:/usr/share/nginx/html
-
-  frontend-builder:
-    build:
-      context: ./frontend/vue-frontend
-      dockerfile: Dockerfile
-    volumes:
-      - frontend-dist:/app/dist
-    command: sh -c "echo 'frontend is build'"
-
 
 
 networks:
   app-network:
     driver: bridge
-
-volumes:
-  frontend-dist:
