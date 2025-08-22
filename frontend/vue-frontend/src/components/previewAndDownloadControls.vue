@@ -1,4 +1,3 @@
-<!-- FIX: preview element blinking -->
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { DownloadVideo } from '@/scripts/utils'
