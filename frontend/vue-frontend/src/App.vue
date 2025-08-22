@@ -1,54 +1,67 @@
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
+import { ref, watch } from 'vue'
 import PreviewOrText from '@/components/previewOrText.vue'
-import { type videoDataFromBackend } from '@/objects/videoDataFromTheServer'
-import { type videoDataFromYoutube } from '@/objects/videoDataFromYoutube'
 import { getVideoDataFromBackend, getVideoDataFromYoutube } from '@/scripts/utils'
-const videoURL = ref<string>()
-const videoDataFromServer = ref<videoDataFromBackend>()
-const videoDataFromYoutube = ref<videoDataFromYoutube>()
-const thumbnaill = computed(function () {
-    return videoDataFromYoutube.value?.thumbnail_url || videoDataFromServer.value?.thumbnail
-})
-const debounceTimeout = ref()
 
-const previewURL = ref<string>()
+const videoURL = ref<string>()
+
+const confirmedURL = ref<string>()
+const thumbnail = ref<string>()
+const videoTitle = ref<string>()
+const authorName = ref<string>()
+const qualityOptions = ref<Record<string, number>>()
 
 watch(videoURL, async function () {
-    clearTimeout(debounceTimeout.value)
-    debounceTimeout.value = setTimeout(function () {
-        const currentUrl = videoURL.value
-        async function updateDataFromYoutube() {
-            if (videoURL.value) {
-                videoDataFromYoutube.value = undefined
-                videoDataFromYoutube.value = await getVideoDataFromYoutube(videoURL.value)
-                if (videoDataFromYoutube.value.title) {
-                    previewURL.value = currentUrl
-                }
+    const currentUrl = videoURL.value
+
+    async function updateDataFromYoutube() {
+        if (videoURL.value) {
+            const videoDataFromYoutube = await getVideoDataFromYoutube(videoURL.value)
+            if (videoDataFromYoutube.title) {
+                confirmedURL.value = currentUrl
+            }
+            if (videoDataFromYoutube.thumbnail_url) {
+                thumbnail.value = videoDataFromYoutube.thumbnail_url
+            }
+            if (videoDataFromYoutube.title) {
+                videoTitle.value = videoDataFromYoutube.title
+            }
+            if (videoDataFromYoutube.author_name) {
+                authorName.value = videoDataFromYoutube.author_name
             }
         }
-        async function upateDataFromBackend() {
-            if (videoURL.value) {
-                videoDataFromServer.value = undefined
-                videoDataFromServer.value = await getVideoDataFromBackend(videoURL.value)
-                if (videoDataFromServer.value.title) {
-                    previewURL.value = currentUrl
-                }
+    }
+
+    async function updateDataFromBackend() {
+        if (videoURL.value) {
+            const videoDataFromServer = await getVideoDataFromBackend(videoURL.value)
+            if (videoDataFromServer.title) {
+                confirmedURL.value = currentUrl
+            }
+            if (videoDataFromServer.thumbnail) {
+                thumbnail.value = videoDataFromServer.thumbnail
+            }
+            if (videoDataFromServer.title) {
+                videoTitle.value = videoDataFromServer.title
+            }
+            if (videoDataFromServer.idByQualityName) {
+                qualityOptions.value = videoDataFromServer.idByQualityName
             }
         }
-        updateDataFromYoutube()
-        upateDataFromBackend()
-    })
+    }
+
+    updateDataFromYoutube()
+    updateDataFromBackend()
 })
 </script>
 
 <template>
     <preview-or-text
-        :author="videoDataFromYoutube?.author_name"
-        :video-title="videoDataFromYoutube?.title || videoDataFromServer?.title"
-        :thumbnail-url="thumbnaill"
-        :quality-options="videoDataFromServer?.idByQualityName"
-        :video-url="previewURL"
+        :author="authorName"
+        :video-title="videoTitle"
+        :thumbnail-url="thumbnail"
+        :quality-options="qualityOptions"
+        :video-url="confirmedURL"
     ></preview-or-text>
     <div style="display: flex; flex-direction: row; justify-content: center">
         <!-- FIX: size of the field -->
