@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import previewAndDownloadControls from './previewAndDownloadControls.vue'
+
 defineProps<{
     videoTitle?: string
     author?: string
@@ -15,9 +16,10 @@ defineProps<{
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            height: 200px;
-            width: 100%;
+            min-height: 200px;
+            max-width: 100%;
             margin-bottom: 1em;
+            max-height: fit-content;
         "
     >
         <preview-and-download-controls
@@ -28,6 +30,7 @@ defineProps<{
             :thumbnail-url="thumbnailUrl"
             :video-url="videoUrl"
         ></preview-and-download-controls>
-        <h1 v-else id="preview-placeholder">Видео с Ютуба в файл</h1>
+
+        <h1 v-else id="preview-placeholder" style="height: fit-content">Видео с Ютуба в файл</h1>
     </div>
 </template>
