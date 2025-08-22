@@ -25,7 +25,15 @@ function download() {
 <template>
     <div id="previewAndDownloadControls">
         <div style="aspect-ratio: 200/113; height: 100%">
+            <a v-if="videoUrl" :href="videoUrl">
+                <img
+                    :src="thumbnailUrl"
+                    alt="Обложка видео"
+                    style="width: 100%; height: 100%; object-fit: cover"
+                />
+            </a>
             <img
+                v-else
                 :src="thumbnailUrl"
                 alt="Обложка видео"
                 style="width: 100%; height: 100%; object-fit: cover"
@@ -34,7 +42,11 @@ function download() {
 
         <div style="display: flex; flex-direction: column; justify-content: space-between">
             <div>
-                <p style="font-size: 1.5em; margin: 0">{{ title }}</p>
+                <a v-if="videoUrl" :href="videoUrl">
+                    <p style="font-size: 1.5em; margin: 0">{{ title }}</p>
+                </a>
+                <p v-else style="font-size: 1.5em; margin: 0">{{ title }}</p>
+
                 <p style="margin-top: 0.5em">{{ author }}</p>
             </div>
 
