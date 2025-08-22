@@ -11,7 +11,6 @@ services:
       SERVER_PORT: 8080 # Внутренний порт, на котором Spring Boot будет слушать
     networks:
       - app-network
-    platform: linux/amd64
 
 
   nginx:
