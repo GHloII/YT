@@ -2,6 +2,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { DownloadVideo } from '@/scripts/utils'
+
 const props = defineProps<{
     title: string
     author?: string
@@ -16,16 +17,7 @@ const size = computed(function (): number {
 })
 </script>
 <template>
-    <div
-        style="
-            display: flex;
-            flex-direction: row;
-            height: 100%;
-            justify-content: center;
-            gap: 1em;
-            max-width: 700px;
-        "
-    >
+    <div id="previewAndDownloadControls">
         <div style="aspect-ratio: 200/113; height: 100%">
             <img
                 :src="thumbnailUrl"
@@ -39,6 +31,7 @@ const size = computed(function (): number {
                 <p style="font-size: 1.5em; margin: 0">{{ title }}</p>
                 <p style="margin-top: 0.5em">{{ author }}</p>
             </div>
+
             <div>
                 <div v-if="qualityOptions" style="margin-bottom: 1em">
                     <span>Качество: </span>
@@ -52,6 +45,7 @@ const size = computed(function (): number {
                         </option>
                     </select>
                 </div>
+
                 <label for="size">Размер{{ `)))` }} </label>
 
                 <input
@@ -61,6 +55,7 @@ const size = computed(function (): number {
                     v-model="sizefield"
                     style="border-style: solid; border-width: 1px; border-radius: 0.5em"
                 />
+
                 <button
                     v-if="videoUrl"
                     :disabled="!size"
@@ -78,3 +73,17 @@ const size = computed(function (): number {
         </div>
     </div>
 </template>
+
+<style>
+#previewAndDownloadControls {
+    display: flex;
+    flex-direction: row;
+    height: 100%;
+    justify-content: center;
+    gap: 1em;
+    max-width: 700px;
+    @media (width <= 650px) {
+        flex-direction: column;
+    }
+}
+</style>
