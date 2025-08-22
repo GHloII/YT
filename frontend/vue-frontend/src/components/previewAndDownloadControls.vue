@@ -25,27 +25,20 @@ function download() {
 <template>
     <div id="previewAndDownloadControls">
         <div style="aspect-ratio: 200/113; height: 100%">
-            <a v-if="videoUrl" :href="videoUrl">
+            <component :is="videoUrl ? 'a' : 'div'" :href="videoUrl" style="display: inline">
                 <img
                     :src="thumbnailUrl"
                     alt="Обложка видео"
                     style="width: 100%; height: 100%; object-fit: cover"
                 />
-            </a>
-            <img
-                v-else
-                :src="thumbnailUrl"
-                alt="Обложка видео"
-                style="width: 100%; height: 100%; object-fit: cover"
-            />
+            </component>
         </div>
 
         <div style="display: flex; flex-direction: column; justify-content: space-between">
             <div>
-                <a v-if="videoUrl" :href="videoUrl">
+                <component :is="videoUrl ? 'a' : 'div'" :href="videoUrl">
                     <p style="font-size: 1.5em; margin: 0">{{ title }}</p>
-                </a>
-                <p v-else style="font-size: 1.5em; margin: 0">{{ title }}</p>
+                </component>
 
                 <p style="margin-top: 0.5em">{{ author }}</p>
             </div>
