@@ -11,10 +11,16 @@ const props = defineProps<{
     videoUrl?: string
 }>()
 const selectedQuality = ref<number>()
-const sizefield = ref<string>('')
+const sizeField = ref<string>('')
 const size = computed(function (): number {
-    return parseInt(sizefield.value)
+    return parseInt(sizeField.value)
 })
+
+function download() {
+    if (size.value && props.videoUrl) {
+        DownloadVideo(props.videoUrl, props.title, size.value)
+    }
+}
 </script>
 <template>
     <div id="previewAndDownloadControls">
@@ -52,23 +58,11 @@ const size = computed(function (): number {
                     id="size"
                     type="text"
                     placeholder="байтов"
-                    v-model="sizefield"
+                    v-model="sizeField"
                     style="border-style: solid; border-width: 1px; border-radius: 0.5em"
                 />
 
-                <button
-                    v-if="videoUrl"
-                    :disabled="!size"
-                    @click="
-                        function () {
-                            if (size && videoUrl) {
-                                DownloadVideo(videoUrl, title, size)
-                            }
-                        }
-                    "
-                >
-                    Скачать
-                </button>
+                <button v-if="videoUrl" :disabled="!size" @click="download">Скачать</button>
             </div>
         </div>
     </div>
