@@ -1,0 +1,453 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>YouTube Video Downloader</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700&display=swap" rel="stylesheet" />
+
+    <style>
+        body,
+        input,
+        button {
+            font-family: 'Inter', sans-serif;
+        }
+
+        h1 {
+            font-size: 5em;
+            text-align: center;
+            font-weight: 700;
+        }
+
+        button {
+            border: solid;
+            border-width: 1px;
+            border-radius: 0.5em;
+            background-color: black;
+            color: white;
+            padding: 0.5em;
+        }
+
+        button:active {
+            color: black;
+            background-color: white;
+        }
+
+        button:disabled {
+            background-color: grey;
+            color: white;
+        }
+
+        input:focus {
+            outline: none;
+        }
+
+        /* App Layout */
+        #app {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 2rem;
+        }
+
+        /* Preview Container */
+        #preview-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 200px;
+            max-width: 100%;
+            margin-bottom: 1em;
+            max-height: fit-content;
+        }
+
+        #preview-placeholder {
+            height: fit-content;
+        }
+
+        /* Preview and Download Controls */
+        #preview-and-download-controls {
+            display: flex;
+            flex-direction: row;
+            height: 100%;
+            justify-content: center;
+            gap: 1em;
+            max-width: 700px;
+        }
+
+        .video-preview {
+            aspect-ratio: 200/113;
+            height: 100%;
+        }
+
+        .video-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .video-info {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .video-details p {
+            margin: 0;
+        }
+
+        #video-title {
+            font-size: 1.5em;
+        }
+
+        #author-name {
+            margin-top: 0.5em;
+        }
+
+        .download-controls {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5em;
+        }
+
+        #quality-selector {
+            margin-bottom: 1em;
+        }
+
+        .size-input {
+            display: flex;
+            align-items: center;
+            gap: 0.5em;
+        }
+
+        /* URL Input Container */
+        .url-input-container {
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+        }
+
+        /* Responsive Design */
+        @media (width <=650px) {
+            #preview-and-download-controls {
+                flex-direction: column;
+            }
+        }
+
+        /* Dark Mode */
+        @media (prefers-color-scheme: dark) {
+            body {
+                background-color: black;
+                color: white;
+            }
+
+            input {
+                background-color: black;
+                color: white;
+            }
+
+            body {
+                --icon-stroke: white;
+            }
+
+            button {
+                color: black;
+                background-color: white;
+            }
+
+            button:active {
+                background-color: black;
+                color: white;
+            }
+
+            button:disabled {
+                color: black;
+            }
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app">
+        <!-- Preview or Text Section -->
+        <div id="preview-container">
+            <div id="preview-placeholder">
+                <h1>Видео с Ютуба в файл</h1>
+            </div>
+
+            <div id="preview-and-download-controls" style="display:none">
+                <div class="video-preview">
+                    <a id="video-link" href="#" target="_blank">
+                        <img id="thumbnail" src="" alt="Обложка видео" />
+                    </a>
+                </div>
+
+                <div class="video-info">
+                    <div class="video-details">
+                        <a id="title-link" href="#" target="_blank">
+                            <p id="video-title"></p>
+                        </a>
+                        <p id="author-name"></p>
+                    </div>
+
+                    <div class="download-controls" id="download-controls">
+                        <div id="quality-selector" style="display: none">
+                            <span>Качество: </span>
+                            <select id="quality-select">
+                                <option value="">Выберите качество</option>
+                            </select>
+                        </div>
+
+                        <div class="size-input">
+                            <label for="size-input">Размер: </label>
+                            <input id="size-input" type="text" placeholder="байтов" style="
+                                        border-style: solid;
+                                        border-width: 1px;
+                                        border-radius: 0.5em;
+                                    " />
+                        </div>
+
+                        <button id="download-btn" disabled>Скачать</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- URL Input Section -->
+        <div class="url-input-container">
+            <input id="url-input" type="text" placeholder="Ссылка на видео" style="
+                        font-size: 2rem;
+                        border-style: solid;
+                        border-width: 1px;
+                        border-radius: 0.5em;
+                        padding: 0.1em;
+                        padding-left: 0.5em;
+                        background-color: transparent;
+                        font-weight: 300;
+                        max-width: 100%;
+                        width: 1024px;
+                    " />
+        </div>
+    </div>
+
+</body>
+
+</html>
+
+<script src="/mimic/dist/mimic.js"></script>
+<script>
+    class Reactive {
+        data
+
+        /**
+         * @type {(() => any)[]}
+         * @private
+         */
+        reaction
+        constructor(reaction, value) {
+            this.value = value
+            this.setReactions(reaction)
+        }
+        set(value) {
+            this.data = value
+            this.reaction()
+        }
+        get() {
+            return this.value
+        }
+        setReactions(reaction) {
+            this.reaction = reaction
+        }
+        getReactions() {
+            return structuredClone(this.reactions)
+        }
+    }
+
+    let youtubeVideoDataPromise
+    let backendVideoDataPromise
+
+
+    // Configuration
+    const VIDEO_SERVER_ADDRESS = location.hostname
+
+    // DOM Elements
+    const urlInput = document.getElementById('url-input')
+    const previewPlaceholder = document.getElementById('preview-placeholder')
+    const previewAndDownloadControls = document.getElementById('preview-and-download-controls')
+    const thumbnail = document.getElementById('thumbnail')
+    const videoTitle = document.getElementById('video-title')
+    const authorName = document.getElementById('author-name')
+    const videoLink = document.getElementById('video-link')
+    const titleLink = document.getElementById('title-link')
+    const qualitySelector = document.getElementById('quality-selector')
+    const qualitySelect = document.getElementById('quality-select')
+    const sizeInput = document.getElementById('size-input')
+    const downloadBtn = document.getElementById('download-btn')
+    const downloadControls = document.getElementById('download-controls')
+
+    // State
+    let currentVideoUrl = ''
+    let qualityOptions = null
+    let selectedQuality = null
+
+    // Utility Functions
+    function makeUrl(url) {
+        return `http://${VIDEO_SERVER_ADDRESS}/download?url=${url}`
+    }
+
+    function makeUrlWithQuality(url, videoQualityId, audioQualityId, size) {
+        return `http://${VIDEO_SERVER_ADDRESS}/download?url=${url}&videoId=${videoQualityId}&audioId=${audioQualityId}&size=${size}`
+    }
+
+    async function getVideoDataFromYoutube(url) {
+            const oembedUrl = `https://www.youtube.com/oembed?url=${encodeURIComponent(
+                url
+            )}&format=json`
+            const response = await fetch(oembedUrl)
+            return await response.json()
+         
+    }
+
+    async function getVideoDataFromBackend(url) {
+            const fullUrl = `http://${VIDEO_SERVER_ADDRESS}/info?url=${url}`
+            const response = await fetch(fullUrl)
+            return await response.json()
+    }
+
+    function downloadVideo(url, videoTitle, size) {
+        const downloadServiceUrl = makeUrlWithQuality(url, 'bestvideo', 'bestaudio', size)
+
+        const a = document.createElement('a')
+        a.href = downloadServiceUrl
+        a.download = `${videoTitle}.mp4`
+        document.body.appendChild(a)
+        a.click()
+        document.body.removeChild(a)
+    }
+
+    // UI Update Functions
+    function showPreview() {
+        previewPlaceholder.style.display = 'none'
+        previewAndDownloadControls.style.display = 'flex'
+    }
+
+    function hidePreview() {
+        previewAndDownloadControls.style.display = 'none'
+    }
+
+    function updateVideoInfo(title, author, thumbnailUrl, videoUrl) {
+        if (title) {
+            videoTitle.textContent = title
+            titleLink.href = videoUrl || '#'
+        }
+
+        if (author) {
+            authorName.textContent = author
+        }
+
+        if (thumbnailUrl) {
+            thumbnail.src = thumbnailUrl
+            videoLink.href = videoUrl || '#'
+        }
+    }
+
+    async function updateDisplayedValue(value, target) {
+        const v = value instanceof Promise ? await value : value
+        if (v) {
+            if (target instanceof Array) {
+                for (t of target) {
+                    target = v
+                }
+                return
+            }
+            target = v
+        }
+    }
+
+    function updateQualityOptions(options) {
+        qualityOptions = options
+
+        if (options && Object.keys(options).length > 0) {
+            qualitySelector.style.display = 'block'
+            qualitySelect.innerHTML = '<option value="">Выберите качество</option>'
+
+            Object.entries(options).forEach(([key, value]) => {
+                const option = document.createElement('option')
+                option.value = value
+                option.textContent = key
+                qualitySelect.appendChild(option)
+            })
+        } else {
+            qualitySelector.style.display = 'none'
+        }
+    }
+
+    function updateDownloadButton() {
+        const hasSize = sizeInput.value.trim() !== ''
+        const hasUrl = currentVideoUrl !== ''
+        downloadBtn.disabled = !hasSize || !hasUrl
+    }
+
+    // Event Listeners
+    urlInput.addEventListener('input', function () {
+        url = urlInput.value.trim()
+        if (!url) {
+            return
+        }
+
+        youtubeVideoDataPromise = getVideoDataFromYoutube(url)
+        backendVideoDataPromise = getVideoDataFromBackend(url)
+
+        Promise.any([youtubeVideoDataPromise, backendVideoDataPromise]).then(async (videoData) => {
+            const data = await videoData
+            if (videoData.title == null) {
+                return
+            }
+            showPreview()
+            videoTitle.innerText = data.title
+            thumbnail.src = data.thumbnail || data.thumbnail_url
+            downloadControls.style.display = 'none'
+        })
+
+        youtubeVideoDataPromise.then(function (videoData) {
+            authorName.innerText = videoData.author_name
+        })
+
+        backendVideoDataPromise.then(function (videoData) {
+            options = videoData.idByQualityName
+            if (options) {
+                updateQualityOptions(options)
+            }
+            downloadControls.style.display = 'flex'
+            updateDownloadButton()
+        })
+    })
+
+    qualitySelect.addEventListener('change', function () {
+        selectedQuality = qualitySelect.value
+        updateDownloadButton()
+    })
+
+    sizeInput.addEventListener('input', function () {
+        updateDownloadButton()
+    })
+
+    downloadBtn.addEventListener('click', function () {
+        const size = parseInt(sizeInput.value)
+        const title = videoTitle.textContent
+
+        if (size && currentVideoUrl && title) {
+            downloadVideo(currentVideoUrl, title, size)
+        }
+    })
+
+    updateDownloadButton()
+
+</script>
