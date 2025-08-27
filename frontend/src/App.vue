@@ -1,11 +1,16 @@
 <script setup lang="ts">
 import {computed, ref, watch} from 'vue'
-import {DownloadVideo, getVideoDataFromBackend, getVideoDataFromYoutube} from '@/scripts/utils'
+import {
+    DownloadVideo,
+    getVideoDataFromBackend,
+    getVideoDataFromYoutube,
+    youTubeVideoId
+} from '@/scripts/utils'
 
 class VideoData {
     title: string
     thumbnail: string
-    url: string
+    url: URL
     authorName?: string
     qualityOptions?: Record<string, number>
     authorUrl?: string
@@ -22,7 +27,7 @@ class VideoData {
         const {title, thumbnail, url, authorName, qualityOptions, authorUrl} = data
         this.title = title
         this.thumbnail = thumbnail
-        this.url = url
+        this.url = new URL(url)
 
 
         if (authorName) {
@@ -72,16 +77,19 @@ class VideoData {
 
 const videoURLInput = ref<string>()
 const videoData = ref<VideoData>()
+const loading = ref<boolean>(false)
 
 
 watch(videoURLInput, async function () {
-    const currentUrl = videoURLInput.value
+    const currentUrl = videoURLInput.value?.trim()
     if (!currentUrl) {
+        loading.value = false
         return
     }
+    loading.value = true
 
-    getVideoDataFromBackend(currentUrl).then(function (data) {
-        if (currentUrl != videoURLInput.value) {
+    const backendDataPromise = getVideoDataFromBackend(currentUrl).then(function (data) {
+        if (!videoURLInput.value || youTubeVideoId(currentUrl) != youTubeVideoId(videoURLInput.value)) {
             return
         }
         if (videoData.value?.dataIsFromTheSameVideo(data.title)) {
@@ -97,8 +105,8 @@ watch(videoURLInput, async function () {
         videoData.value?.makeDownloadable(data.title)
     })
 
-    getVideoDataFromYoutube(currentUrl).then(function (data) {
-        if (currentUrl != videoURLInput.value) {
+    const youtubeDataPromise = getVideoDataFromYoutube(currentUrl).then(function (data) {
+        if (!videoURLInput.value || youTubeVideoId(currentUrl) != youTubeVideoId(videoURLInput.value)) {
             return
         }
         console.log(data)
@@ -116,6 +124,9 @@ watch(videoURLInput, async function () {
                 url: currentUrl
             })
         }
+    })
+    backendDataPromise.then(function () {
+        loading.value = false
     })
 })
 
@@ -172,7 +183,7 @@ function download() {
                     </component>
                 </div>
 
-                <div>
+                <div id="videoDownloadControls" v-if="!loading">
                     <div v-if="videoData.qualityOptions" style="margin-bottom: 1em">
                         <span>Качество: </span>
                         <select v-model="selectedQuality">
@@ -202,6 +213,7 @@ function download() {
                         Скачать
                     </button>
                 </div>
+                <div v-else>Загрузка уровней качества...</div>
             </div>
         </div>
         <h1 v-else id="preview-placeholder" style="height: fit-content">Видео с Ютуба в файл</h1>
