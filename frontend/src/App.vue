@@ -163,7 +163,10 @@ function download() {
                         <p style="font-size: 1.5em; margin: 0">{{ videoData.title }}</p>
                     </component>
 
-                    <p style="margin-top: 0.5em">{{ videoData.authorName }}</p>
+                    <component :is="videoData.authorUrl? 'a' : 'p'" :href="videoData.authorUrl"
+                               style="margin-top: 0.5em">
+                        {{ videoData.authorName }}
+                    </component>
                 </div>
 
                 <div>
