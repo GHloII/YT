@@ -19,6 +19,7 @@ button {
 
     padding: 0.5em;
 }
+
 button:active {
     color: black;
     background-color: white;
@@ -47,33 +48,28 @@ input:focus {
     body {
         --icon-stroke: white;
     }
+
     button {
         color: black;
         background-color: white;
     }
+
     button:active {
         background-color: black;
         color: white;
     }
+
     button:disabled {
         color: black;
     }
 }
 
-/* input {
-    width: 100%;
-    padding-left: 0.5em;
-    padding-right: 0.5em;
+input {
+    border-style: solid;
+    border-width: 1px;
+    border-radius: 0.5em;
+    padding: 0.1em;
+    /*padding-left: 0.5em;*/
     background-color: transparent;
-    font-size: inherit; */
-
-/* Fade only on the right */
-/* -webkit-mask-image: linear-gradient(to right, black 0%, black 90%, transparent 100%);
-    -webkit-mask-repeat: no-repeat;
-    -webkit-mask-size: 100% 100%;
-    -webkit-mask-composite: destination-in;
-    mask-composite: destination-in;
-    mask-image: linear-gradient(to right, black 0%, black 90%, transparent 100%);
-    mask-repeat: no-repeat;
-    mask-size: 100% 100%;
-} */
+    max-width: 100%;
+}
