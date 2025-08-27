@@ -42,10 +42,7 @@ class VideoData {
 
 
     dataIsFromTheSameVideo(title: string): boolean {
-        if (title != this.title) {
-            return false
-        }
-        return true
+        return title == this.title;
     }
 
     addQualityOptions(qualityOptions: Record<string, number>, title: string) {
