@@ -43,7 +43,7 @@ class VideoData {
 
     dataIsFromTheSameVideo(title: string): boolean {
         if (title != this.title) {
-            throw new Error("data is for another video")
+            return false
         }
         return true
     }
@@ -73,19 +73,20 @@ class VideoData {
 }
 
 
-const videoURL = ref<string>()
-
+const videoURLInput = ref<string>()
 const videoData = ref<VideoData>()
 
 
-watch(videoURL, async function () {
-    const currentUrl = videoURL.value
+watch(videoURLInput, async function () {
+    const currentUrl = videoURLInput.value
     if (!currentUrl) {
         return
     }
 
     getVideoDataFromBackend(currentUrl).then(function (data) {
-
+        if (currentUrl != videoURLInput.value) {
+            return
+        }
         if (videoData.value?.dataIsFromTheSameVideo(data.title)) {
             videoData.value.addQualityOptions(data.idByQualityName, data.title)
         } else {
@@ -100,8 +101,13 @@ watch(videoURL, async function () {
     })
 
     getVideoDataFromYoutube(currentUrl).then(function (data) {
+        if (currentUrl != videoURLInput.value) {
+            return
+        }
         console.log(data)
+        console.log(videoData.value?.dataIsFromTheSameVideo(data.title))
         if (videoData.value?.dataIsFromTheSameVideo(data.title)) {
+            console.log('same title')
             videoData.value.addAuthorName(data.author_name, data.title)
         } else {
             console.log("creating object")
@@ -141,12 +147,12 @@ function download() {
             min-height: 200px;
             max-width: 100%;
             margin-bottom: 1em;
-            max-height: fit-content;
+            height: fit-content;
         "
     >
 
         <div v-if="videoData" id="previewAndDownloadControls">
-            <div style="aspect-ratio: 200/113; height: 100%">
+            <div style="aspect-ratio: 200/113;  max-width: 100%">
                 <component :is="videoData.url ? 'a' : 'div'" :href="videoData.url"
                            style="display: inline">
                     <img
@@ -191,7 +197,6 @@ function download() {
                             type="text"
                             placeholder="байтов"
                             v-model="sizeField"
-                            style="border-style: solid; border-width: 1px; border-radius: 0.5em"
                         />
                     </div>
 
@@ -210,17 +215,10 @@ function download() {
         <input
             type="text"
             placeholder="Ссылка на видео"
-            v-model="videoURL"
+            v-model="videoURLInput"
             style="
                 font-size: 2rem;
-                border-style: solid;
-                border-width: 1px;
-                border-radius: 0.5em;
-                padding: 0.1em;
-                padding-left: 0.5em;
-                background-color: transparent;
                 font-weight: 300;
-                max-width: 100%;
                 width: 1024px;
             "
         />
@@ -238,4 +236,5 @@ function download() {
         flex-direction: column;
     }
 }
+
 </style>
