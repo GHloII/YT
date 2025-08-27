@@ -1,6 +1,6 @@
-import { VIDEO_SERVER_ADDRESS } from '@/config'
-import type { videoDataFromBackend } from '@/objects/videoDataFromTheServer'
-import type { videoDataFromYoutube } from '@/objects/videoDataFromYoutube'
+import {VIDEO_SERVER_ADDRESS} from '@/config'
+import type {videoDataFromBackend} from '@/objects/videoDataFromTheServer'
+import type {videoDataFromYoutube} from '@/objects/videoDataFromYoutube'
 
 export function makeurl(url: string) {
     // TODO: replace with https
@@ -35,10 +35,10 @@ export async function getVideoDataFromBackend(url: string): Promise<videoDataFro
     return data
 }
 
-export async function DownloadVideo(url: string, videoTitle: string, size: number) {
-    console.log(url)
+export async function DownloadVideo(url: string | URL, videoTitle: string, size: number) {
+
     // const downloadServiceUrl = videoQualityId? makeurlWithQuality(url,videoQualityId, 'bestaudio'): makeurlWithQuality(url,'bestvideo', 'bestaudio')
-    const downloadServiceUrl = makeurlWithQuality(url, 'bestvideo', 'bestaudio', size)
+    const downloadServiceUrl = makeurlWithQuality(url.toString(), 'bestvideo', 'bestaudio', size)
     // const downloadServiceUrl = makeurl(url)
 
     const a = document.createElement('a')
@@ -48,4 +48,23 @@ export async function DownloadVideo(url: string, videoTitle: string, size: numbe
     document.body.appendChild(a)
     a.click()
     document.body.removeChild(a)
+}
+
+
+export function youTubeVideoId(url: string | URL): string | null {
+    try {
+        const u = new URL(url);
+
+        if (u.hostname === "youtu.be") {
+            return u.pathname.slice(1);
+        }
+
+        if (u.hostname.includes("youtube.com") || u.hostname.includes("youtube-nocookie.com")) {
+            return u.searchParams.get("v");
+        }
+
+        return null;
+    } catch {
+        return null;
+    }
 }
