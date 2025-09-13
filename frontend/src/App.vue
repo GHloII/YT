@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import {computed, ref, watch} from 'vue'
+import { computed, ref, watch } from 'vue'
 import {
     DownloadVideo,
     getVideoDataFromBackend,
     getVideoDataFromYoutube,
-    youTubeVideoId
+    youTubeVideoId,
 } from '@/scripts/utils'
 
 class VideoData {
@@ -12,23 +12,29 @@ class VideoData {
     thumbnail: string
     url: URL
     authorName?: string
-    qualityOptions?: Record<string, number>
+    qualityIdByResolutionName?: Record<string, number>
     authorUrl?: string
     downloadable: boolean = false
 
     constructor(data: {
-        title: string,
-        thumbnail: string,
-        url: string,
-        authorName?: string,
-        qualityOptions?: Record<string, number>,
+        title: string
+        thumbnail: string
+        url: string
+        authorName?: string
+        qualityIdByResolutionName?: Record<string, number>
         authorUrl?: string
     }) {
-        const {title, thumbnail, url, authorName, qualityOptions, authorUrl} = data
+        const {
+            title,
+            thumbnail,
+            url,
+            authorName,
+            qualityIdByResolutionName: qualityOptions,
+            authorUrl,
+        } = data
         this.title = title
         this.thumbnail = thumbnail
         this.url = new URL(url)
-
 
         if (authorName) {
             this.addAuthorName(authorName, title)
@@ -42,17 +48,15 @@ class VideoData {
             this.addAuthorUrl(authorUrl, title)
         }
         console.log(this)
-
     }
 
-
     dataIsFromTheSameVideo(title: string): boolean {
-        return title == this.title;
+        return title == this.title
     }
 
     addQualityOptions(qualityOptions: Record<string, number>, title: string) {
         this.dataIsFromTheSameVideo(title)
-        this.qualityOptions = qualityOptions
+        this.qualityIdByResolutionName = qualityOptions
     }
 
     addAuthorUrl(url: string, title: string) {
@@ -70,15 +74,11 @@ class VideoData {
             this.downloadable = true
         }
     }
-
-
 }
-
 
 const videoURLInput = ref<string>()
 const videoData = ref<VideoData>()
 const loading = ref<boolean>(false)
-
 
 watch(videoURLInput, async function () {
     const currentUrl = videoURLInput.value?.trim()
@@ -89,24 +89,31 @@ watch(videoURLInput, async function () {
     loading.value = true
 
     const backendDataPromise = getVideoDataFromBackend(currentUrl).then(function (data) {
-        if (!videoURLInput.value || youTubeVideoId(currentUrl) != youTubeVideoId(videoURLInput.value)) {
+        if (
+            !videoURLInput.value ||
+            youTubeVideoId(currentUrl) != youTubeVideoId(videoURLInput.value)
+        ) {
             return
         }
+
         if (videoData.value?.dataIsFromTheSameVideo(data.title)) {
             videoData.value.addQualityOptions(data.idByQualityName, data.title)
         } else {
             videoData.value = new VideoData({
                 title: data.title,
-                qualityOptions: data.idByQualityName,
+                qualityIdByResolutionName: data.idByQualityName,
                 thumbnail: data.thumbnail,
-                url: currentUrl
+                url: currentUrl,
             })
         }
         videoData.value?.makeDownloadable(data.title)
     })
 
     const youtubeDataPromise = getVideoDataFromYoutube(currentUrl).then(function (data) {
-        if (!videoURLInput.value || youTubeVideoId(currentUrl) != youTubeVideoId(videoURLInput.value)) {
+        if (
+            !videoURLInput.value ||
+            youTubeVideoId(currentUrl) != youTubeVideoId(videoURLInput.value)
+        ) {
             return
         }
         console.log(data)
@@ -115,13 +122,13 @@ watch(videoURLInput, async function () {
             console.log('same title')
             videoData.value.addAuthorName(data.author_name, data.title)
         } else {
-            console.log("creating object")
+            console.log('creating object')
             videoData.value = new VideoData({
                 title: data.title,
                 thumbnail: data.thumbnail_url,
                 authorName: data.author_name,
                 authorUrl: data.author_url,
-                url: currentUrl
+                url: currentUrl,
             })
         }
     })
@@ -129,7 +136,6 @@ watch(videoURLInput, async function () {
         loading.value = false
     })
 })
-
 
 const selectedQuality = ref<number>()
 const sizeField = ref<string>('')
@@ -139,13 +145,17 @@ const size = computed(function (): number {
 
 function download() {
     if (videoData.value?.downloadable) {
-        DownloadVideo(videoData.value.url, videoData.value.title, size.value)
+        DownloadVideo({
+            url: videoData.value.url,
+            size: size.value,
+            videoTitle: videoData.value.title,
+            videoQualityId: selectedQuality.value?.toString(),
+        })
     }
 }
 </script>
 
 <template>
-
     <div
         style="
             display: flex;
@@ -158,11 +168,13 @@ function download() {
             height: fit-content;
         "
     >
-
         <div v-if="videoData" id="previewAndDownloadControls">
-            <div style="aspect-ratio: 200/113;  max-width: 100%">
-                <component :is="videoData.url ? 'a' : 'div'" :href="videoData.url"
-                           style="display: inline">
+            <div style="aspect-ratio: 200/113; max-width: 100%">
+                <component
+                    :is="videoData.url ? 'a' : 'div'"
+                    :href="videoData.url"
+                    style="display: inline"
+                >
                     <img
                         :src="videoData.thumbnail"
                         alt="Обложка видео"
@@ -177,18 +189,23 @@ function download() {
                         <p style="font-size: 1.5em; margin: 0">{{ videoData.title }}</p>
                     </component>
 
-                    <component :is="videoData.authorUrl? 'a' : 'p'" :href="videoData.authorUrl"
-                               style="margin-top: 0.5em">
+                    <component
+                        :is="videoData.authorUrl ? 'a' : 'p'"
+                        :href="videoData.authorUrl"
+                        style="margin-top: 0.5em"
+                    >
                         {{ videoData.authorName }}
                     </component>
                 </div>
 
                 <div id="videoDownloadControls" v-if="!loading">
-                    <div v-if="videoData.qualityOptions" style="margin-bottom: 1em">
+                    <div v-if="videoData.qualityIdByResolutionName" style="margin-bottom: 1em">
                         <span>Качество: </span>
                         <select v-model="selectedQuality">
                             <option
-                                v-for="[key, value] in Object.entries(videoData.qualityOptions ?? {})"
+                                v-for="[key, value] in Object.entries(
+                                    videoData.qualityIdByResolutionName ?? {},
+                                )"
                                 :key="key"
                                 :value="value"
                             >
@@ -200,16 +217,14 @@ function download() {
                     <div v-if="videoData.downloadable">
                         <label for="size">Размер{{ `)))` }} </label>
 
-                        <input
-                            id="size"
-                            type="text"
-                            placeholder="байтов"
-                            v-model="sizeField"
-                        />
+                        <input id="size" type="text" placeholder="байтов" v-model="sizeField" />
                     </div>
 
-                    <button v-if="videoData.url && videoData.downloadable" :disabled="!size"
-                            @click="download">
+                    <button
+                        v-if="videoData.url && videoData.downloadable"
+                        :disabled="!size"
+                        @click="download"
+                    >
                         Скачать
                     </button>
                 </div>
@@ -225,11 +240,7 @@ function download() {
             type="text"
             placeholder="Ссылка на видео"
             v-model="videoURLInput"
-            style="
-                font-size: 2rem;
-                font-weight: 300;
-                width: 1024px;
-            "
+            style="font-size: 2rem; font-weight: 300; width: 1024px"
         />
     </div>
 </template>
@@ -245,5 +256,4 @@ function download() {
         flex-direction: column;
     }
 }
-
 </style>
