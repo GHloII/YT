@@ -28,7 +28,7 @@ public class DownloadController {
             @RequestParam String url,
             @RequestParam(required = false) String videoId, // Добавляем videoId
             @RequestParam(required = false) String audioId, // Добавляем audioId
-            @RequestParam(required = false) long size, // Добавляем size
+            @RequestParam(required = false) Long size, // Добавляем size
             HttpServletResponse response
     ) throws IOException {
 
@@ -52,7 +52,7 @@ public class DownloadController {
         // Динамическое определение Content-Type
         response.setContentType("video/mp4");
         response.setHeader("Content-Disposition", "attachment; filename=\"video.mp4\"");
-        if (size > 0) {
+        if (size!=null && size > 0) {
             response.setHeader("Content-Length", String.valueOf(size));
         }
 

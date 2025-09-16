@@ -35,10 +35,18 @@ export async function getVideoDataFromBackend(url: string): Promise<videoDataFro
     return data
 }
 
-export async function DownloadVideo(url: string, videoTitle: string, size: number) {
-    console.log(url)
-    // const downloadServiceUrl = videoQualityId? makeurlWithQuality(url,videoQualityId, 'bestaudio'): makeurlWithQuality(url,'bestvideo', 'bestaudio')
-    const downloadServiceUrl = makeurlWithQuality(url, 'bestvideo', 'bestaudio', size)
+export async function DownloadVideo(params: {
+    url: string | URL
+    videoQualityId?: string
+    videoTitle: string
+    size: number
+}) {
+    const { url, videoQualityId, videoTitle, size } = params
+    console.log(params)
+    const downloadServiceUrl = videoQualityId
+        ? makeurlWithQuality(url.toString(), videoQualityId, 'bestaudio', size)
+        : makeurlWithQuality(url.toString(), 'bestvideo', 'bestaudio', size)
+    // const downloadServiceUrl = makeurlWithQuality(url.toString(), 'bestvideo', 'bestaudio', size)
     // const downloadServiceUrl = makeurl(url)
 
     const a = document.createElement('a')
@@ -48,4 +56,22 @@ export async function DownloadVideo(url: string, videoTitle: string, size: numbe
     document.body.appendChild(a)
     a.click()
     document.body.removeChild(a)
+}
+
+export function youTubeVideoId(url: string | URL): string | null {
+    try {
+        const u = new URL(url)
+
+        if (u.hostname === 'youtu.be') {
+            return u.pathname.slice(1)
+        }
+
+        if (u.hostname.includes('youtube.com') || u.hostname.includes('youtube-nocookie.com')) {
+            return u.searchParams.get('v')
+        }
+
+        return null
+    } catch {
+        return null
+    }
 }
