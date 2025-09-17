@@ -37,7 +37,7 @@ public class InfoController {
             Map<String, String> idByQualityName = new LinkedHashMap<>(); // Сохраняем порядок
 
             // Порядок предпочтения видеокодеков
-            List<String> videoCodecPreference = Arrays.asList("avc1", "vp9", "av1");
+            final List<String> videoCodecPreference = Arrays.asList("avc1", "vp9", "av1");
 
             // Группируем видеоформаты по разрешению
             Map<String, List<FormatDetails>> videoFormatsByResolution = videoInfo.videoQualities().stream()
@@ -51,22 +51,7 @@ public class InfoController {
                         List<FormatDetails> formatsForResolution = entry.getValue();
 
                         // Находим лучший формат для данного разрешения согласно предпочтениям кодеков
-                        FormatDetails bestFormat = null;
-                        for (String preferredCodec : videoCodecPreference) {
-                            for (FormatDetails format : formatsForResolution) {
-                                if (format.vcodec() != null && format.vcodec().equals(preferredCodec)) {
-                                    bestFormat = format;
-                                    break;
-                                }
-                            }
-                            if (bestFormat != null) {
-                                break;
-                            }
-                        }
-                        // Если не найден предпочтительный кодек, берем первый попавшийся
-                        if (bestFormat == null && !formatsForResolution.isEmpty()) {
-                            bestFormat = formatsForResolution.get(0);
-                        }
+                        FormatDetails bestFormat = getFormatDetails(videoCodecPreference, formatsForResolution);
 
                         if (bestFormat != null) {
                             resolutions.add(resolution);
@@ -109,5 +94,25 @@ public class InfoController {
             // В случае ошибки выбрасываем RuntimeException, который будет обработан Spring Boot
             throw new RuntimeException("Ошибка при получении информации о видео", e);
         }
+    }
+
+    private static FormatDetails getFormatDetails(final List<String> videoCodecPreference, List<FormatDetails> formatsForResolution) {
+        FormatDetails bestFormat = null;
+        for (String preferredCodec : videoCodecPreference) {
+            for (FormatDetails format : formatsForResolution) {
+                if (format.vcodec() != null && format.vcodec().equals(preferredCodec)) {
+                    bestFormat = format;
+                    break;
+                }
+            }
+            if (bestFormat != null) {
+                break;
+            }
+        }
+        // Если не найден предпочтительный кодек, берем первый попавшийся
+        if (bestFormat == null && !formatsForResolution.isEmpty()) {
+            bestFormat = formatsForResolution.get(0);
+        }
+        return bestFormat;
     }
 }
