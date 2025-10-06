@@ -9,6 +9,11 @@ services:
       - "${SERVER_PORT:-8080}:8080" # Маппинг порта хоста (по умолчанию 8080) на внутренний порт контейнера 8080
     environment:
       SERVER_PORT: 8080 # Внутренний порт, на котором Spring Boot будет слушать
+      SPRING_DATA_REDIS_HOST: redis
+      SPRING_DATA_REDIS_PORT: 6379
+      # SPRING_DATA_REDIS_PASSWORD: yourpassword # раскомментируйте, если используете пароль
+    depends_on:
+      - redis
     networks:
       - app-network
 
@@ -24,7 +29,20 @@ services:
     networks:
       - app-network
 
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - redis_data:/data
+    networks:
+      - app-network
+
 
 networks:
   app-network:
     driver: bridge
+
+volumes:
+  redis_data:
