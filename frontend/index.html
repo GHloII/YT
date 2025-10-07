@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="ru">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>Скачать видео с Ютуба</title>
+        <style>
+            :root {
+                --text-field-height: 2rem;
+            }
+
+            body {
+                display: flex;
+                flex-direction: column;
+                font-family: Inter, sans-serif;
+                align-items: center;
+            }
+
+            .main-video-link-input {
+                border: none;
+                outline: none;
+                font-size: 2rem;
+                font-weight: lighter;
+            }
+
+            .video-info-container {
+                height: 50vh;
+                min-height: fit-content;
+
+                display:flex;
+                flex-direction: row;
+            }
+
+            .video-and-input-container {
+                width: 1000px;
+                max-width: 100%;
+            }
+
+            .main-video-link-input::placeholder {
+                opacity: 30%;
+                color: black;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="video-and-input-container">
+            <div class="video-info-container">
+                <div>
+                    <img src="hq720.avif" />
+                </div>
+                <div>
+                    <div>
+                        <h1 class="video-title">Little Lamb Chilling With Cat</h1>
+                        <p class="video-author">Lee Walters</p>
+                    </div>
+                    <div>
+                        <select></select>
+                        <button></button>
+                    </div>
+                </div>
+            </div>
+            <div class="main-video-link-input-container">
+                <input
+                    class="main-video-link-input"
+                    placeholder="Ссылка на видео"
+                    type="url"
+                    id="video-url-input"
+                    autofocus
+                />
+            </div>
+        </div>
+    </body>
+</html>
