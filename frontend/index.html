@@ -5,8 +5,12 @@
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <title>Скачать видео с Ютуба</title>
         <style>
+            @import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
             :root {
                 --text-field-height: 2rem;
+                --controls-height: 2.125rem;
+                --controls-width: 7.5rem;
+                --primary-color: #ff0033;
             }
 
             body {
@@ -21,14 +25,14 @@
                 outline: none;
                 font-size: 2rem;
                 font-weight: lighter;
+                background:transparent;
             }
 
-            .video-info-container {
-                height: 50vh;
+            .video-info {
                 min-height: fit-content;
-
-                display:flex;
+                display: flex;
                 flex-direction: row;
+                gap: 1rem;
             }
 
             .video-and-input-container {
@@ -40,22 +44,84 @@
                 opacity: 30%;
                 color: black;
             }
+
+            .video-title {
+                margin-top: 0;
+                padding-top: 0;
+            }
+
+            .video-info-container {
+                height: 50vh;
+                display: flex;
+                flex-direction: column;
+                justify-items: end;
+                justify-content: flex-end;
+            }
+
+            .video-preview {
+                height: 100%;
+            }
+            .video-preview-image {
+                width: 100%;
+                height: 100%;
+            }
+            .video-info-right-half {
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
+            }
+
+            .download-control {
+                height: var(--controls-height);
+                width: var(--controls-width);
+                border-radius: 3px;
+                @supports (corner-shape: squircle) {
+                    corner-shape:squircle;
+                    border-radius: 10px;
+                }
+                border:none;
+            }
+
+
+            select {
+                background-color: #EFEFEF;
+                padding-left: 0.5rem;
+                padding-right: 0.5rem;
+            }
+
+            .download-button {
+                background-color: var(--primary-color);
+                color:white
+            }
         </style>
     </head>
     <body>
         <div class="video-and-input-container">
             <div class="video-info-container">
-                <div>
-                    <img src="hq720.avif" />
-                </div>
-                <div>
-                    <div>
-                        <h1 class="video-title">Little Lamb Chilling With Cat</h1>
-                        <p class="video-author">Lee Walters</p>
+                <div class="video-info">
+                    <div class="video-preview">
+                        <img src="hq720.avif" class="video-preview-image" />
                     </div>
-                    <div>
-                        <select></select>
-                        <button></button>
+                    <div class="video-info-right-half">
+                        <div class="video-title-and-author-name">
+                            <a
+                                href="https://youtu.be/FiR6vlowbd0?si=WB8jY1Jrnjb8Lfb8"
+                            >
+                                <h1 class="video-title">
+                                    Little Lamb Chilling With Cat
+                                </h1>
+                            </a>
+                            <p class="video-author">Lee Walters</p>
+                        </div>
+                        <div class="download-controls">
+                            <select class="quality-select download-control">
+                                <option>1080p</option>
+                                <option>360p</option>
+                            </select>
+                            <button class="download-control download-button">
+                                Скачать
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
