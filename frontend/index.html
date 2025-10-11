@@ -1,37 +1,52 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ru">
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <title>Скачать видео с Ютуба</title>
         <style>
-            @import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
+            @import url("https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap");
+
             :root {
                 --text-field-height: 2rem;
                 --controls-height: 2.125rem;
                 --controls-width: 7.5rem;
                 --primary-color: #ff0033;
+                --text-color: black;
             }
 
             body {
                 display: flex;
                 flex-direction: column;
-                font-family: Inter, sans-serif;
                 align-items: center;
+            }
+
+            * {
+                font-family: Inter, sans-serif;
             }
 
             .main-video-link-input {
                 border: none;
                 outline: none;
                 font-size: 2rem;
-                font-weight: lighter;
-                background:transparent;
+                font-weight: 400;
+                max-width: 100%;
+                height:fit-content;
+                background: transparent;
+                white-space: nowrap;
+                overflow-x: scroll;
+                box-sizing: border-box;
+
             }
 
             .video-info {
                 min-height: fit-content;
                 display: flex;
                 flex-direction: row;
+
+                @media (width <= 600px) {
+                    flex-direction: column;
+                }
                 gap: 1rem;
             }
 
@@ -42,16 +57,24 @@
 
             .main-video-link-input::placeholder {
                 opacity: 30%;
-                color: black;
+                color: var(--text-color);
             }
 
             .video-title {
                 margin-top: 0;
+                margin-bottom: 0.25em;
                 padding-top: 0;
+                font-weight: 400;
+                line-height: 2.5rem;
+            }
+
+            .video-author {
+                margin-top: 0;
+                margin-bottom: 0;
             }
 
             .video-info-container {
-                height: 50vh;
+                min-height: 50vh;
                 display: flex;
                 flex-direction: column;
                 justify-items: end;
@@ -69,29 +92,52 @@
                 display: flex;
                 flex-direction: column;
                 justify-content: space-between;
+                gap: 2rem;
             }
 
+            .download-controls {
+                display: flex;
+                flex-direction: row;
+                flex-wrap: nowrap;
+                gap: 1.25rem;
+            }
             .download-control {
                 height: var(--controls-height);
                 width: var(--controls-width);
+                @media(width <= 600px) {
+                    width:100%;
+                }
                 border-radius: 3px;
                 @supports (corner-shape: squircle) {
-                    corner-shape:squircle;
+                    corner-shape: squircle;
                     border-radius: 10px;
                 }
-                border:none;
+                font-size: 1rem;
+                border: none;
             }
 
-
             select {
-                background-color: #EFEFEF;
+                -webkit-appearance: none;
+                -moz-appearance: none;
+                appearance: none;
+
+                background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' stroke='black' stroke-width='2' fill='none' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
+                background-repeat: no-repeat;
+                background-position: right 0.5em center;
+                background-size: 2em auto;
+
+                background-color: #efefef;
                 padding-left: 0.5rem;
                 padding-right: 0.5rem;
             }
 
             .download-button {
                 background-color: var(--primary-color);
-                color:white
+                color: white;
+            }
+            .video-title-link {
+                text-decoration: none;
+                color: var(--text-color);
             }
         </style>
     </head>
@@ -105,6 +151,7 @@
                     <div class="video-info-right-half">
                         <div class="video-title-and-author-name">
                             <a
+                                class="video-title-link"
                                 href="https://youtu.be/FiR6vlowbd0?si=WB8jY1Jrnjb8Lfb8"
                             >
                                 <h1 class="video-title">
