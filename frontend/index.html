@@ -25,18 +25,17 @@
                 font-family: Inter, sans-serif;
             }
 
-            .main-video-link-input {
+            #main-video-link-input {
                 border: none;
                 outline: none;
                 font-size: 2rem;
                 font-weight: 400;
                 max-width: 100%;
-                height:fit-content;
+                height: fit-content;
                 background: transparent;
                 white-space: nowrap;
                 overflow-x: scroll;
                 box-sizing: border-box;
-
             }
 
             .video-info {
@@ -74,7 +73,7 @@
             }
 
             .video-info-container {
-                min-height: 50vh;
+                min-height: calc(50vh - var(--text-field-height));
                 display: flex;
                 flex-direction: column;
                 justify-items: end;
@@ -104,8 +103,8 @@
             .download-control {
                 height: var(--controls-height);
                 width: var(--controls-width);
-                @media(width <= 600px) {
-                    width:100%;
+                @media (width <= 600px) {
+                    width: 100%;
                 }
                 border-radius: 3px;
                 @supports (corner-shape: squircle) {
@@ -144,37 +143,10 @@
     <body>
         <div class="video-and-input-container">
             <div class="video-info-container">
-                <div class="video-info">
-                    <div class="video-preview">
-                        <img src="hq720.avif" class="video-preview-image" />
-                    </div>
-                    <div class="video-info-right-half">
-                        <div class="video-title-and-author-name">
-                            <a
-                                class="video-title-link"
-                                href="https://youtu.be/FiR6vlowbd0?si=WB8jY1Jrnjb8Lfb8"
-                            >
-                                <h1 class="video-title">
-                                    Little Lamb Chilling With Cat
-                                </h1>
-                            </a>
-                            <p class="video-author">Lee Walters</p>
-                        </div>
-                        <div class="download-controls">
-                            <select class="quality-select download-control">
-                                <option>1080p</option>
-                                <option>360p</option>
-                            </select>
-                            <button class="download-control download-button">
-                                Скачать
-                            </button>
-                        </div>
-                    </div>
-                </div>
             </div>
             <div class="main-video-link-input-container">
                 <input
-                    class="main-video-link-input"
+                    id="main-video-link-input"
                     placeholder="Ссылка на видео"
                     type="url"
                     id="video-url-input"
@@ -183,4 +155,47 @@
             </div>
         </div>
     </body>
+
+    <script>
+        const mainVideoLinkInput = document.getElementById('main-video-link-input')
+
+        function currentLinkInInput() {
+            return mainVideoLinkInput.value
+        }
+
+        mainVideoLinkInput.addEventListener('input', ()=>{
+            console.log(currentLinkInInput())
+        })
+
+        const videoInfo = (imageLink, videoLink, videoTitle, videoAuthor, qualityOptions) => `
+        <div class="video-info">
+            <div class="video-preview">
+                <img src="${imageLink}" class="video-preview-image" />
+            </div>
+            <div class="video-info-right-half">
+                <div class="video-title-and-author-name">
+                    <a
+                        class="video-title-link"
+                        href="${videoLink}"
+                    >
+                        <h1 class="video-title">
+                            ${videoTitle}
+                        </h1>
+                    </a>
+                    <p class="video-author">${videoAuthor}</p>
+                </div>
+                <div class="download-controls">
+                    <select class="quality-select download-control">
+                        <option>1080p</option>
+                        <option>360p</option>
+                    </select>
+                    <button class="download-control download-button">
+                        Скачать
+                    </button>
+                </div>
+            </div>
+        </div>
+        `
+
+    </script>
 </html>
