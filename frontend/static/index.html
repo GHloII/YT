@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ru">
     <head>
         <meta charset="UTF-8" />
@@ -142,8 +142,7 @@
     </head>
     <body>
         <div class="video-and-input-container">
-            <div class="video-info-container">
-            </div>
+            <div class="video-info-container"></div>
             <div class="main-video-link-input-container">
                 <input
                     id="main-video-link-input"
@@ -156,46 +155,5 @@
         </div>
     </body>
 
-    <script>
-        const mainVideoLinkInput = document.getElementById('main-video-link-input')
-
-        function currentLinkInInput() {
-            return mainVideoLinkInput.value
-        }
-
-        mainVideoLinkInput.addEventListener('input', ()=>{
-            console.log(currentLinkInInput())
-        })
-
-        const videoInfo = (imageLink, videoLink, videoTitle, videoAuthor, qualityOptions) => `
-        <div class="video-info">
-            <div class="video-preview">
-                <img src="${imageLink}" class="video-preview-image" />
-            </div>
-            <div class="video-info-right-half">
-                <div class="video-title-and-author-name">
-                    <a
-                        class="video-title-link"
-                        href="${videoLink}"
-                    >
-                        <h1 class="video-title">
-                            ${videoTitle}
-                        </h1>
-                    </a>
-                    <p class="video-author">${videoAuthor}</p>
-                </div>
-                <div class="download-controls">
-                    <select class="quality-select download-control">
-                        <option>1080p</option>
-                        <option>360p</option>
-                    </select>
-                    <button class="download-control download-button">
-                        Скачать
-                    </button>
-                </div>
-            </div>
-        </div>
-        `
-
-    </script>
+    <script src="/script.js"></script>
 </html>
