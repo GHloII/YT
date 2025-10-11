@@ -16,9 +16,9 @@ public class TaskRedisService {
     }
     
     // Сохраняем задачу в Hash
-    public void saveTask(String taskId, String url, TaskStatus status) {
+    private void saveTask(String taskId, String url, TaskStatus status) {
         String taskKey = TASK_PREFIX + taskId;
-        
+
         redisTemplate.opsForHash().put(taskKey, "url", url);
         redisTemplate.opsForHash().put(taskKey, "status", status.getValue());
     }
@@ -48,6 +48,12 @@ public class TaskRedisService {
         String taskKey = TASK_PREFIX + taskId;
         redisTemplate.opsForHash().put(taskKey, "status", status.getValue());
     }
+
+    public void updateTaskStatus(DownloadTask task) {
+        String taskKey = TASK_PREFIX + task.id();
+        redisTemplate.opsForHash().put(taskKey, "status", task.status().getValue());
+    }
+
     
     // Получаем только статус задачи
     public TaskStatus getTaskStatus(String taskId) {
