@@ -45,7 +45,6 @@ public class DownloadService {
                         System.err.write(buffer, 0, bytesRead);
                     }
                 } catch (IOException e) {
-                    // Логировать ошибку чтения stderr, если необходимо
                     System.err.println("Ошибка чтения stderr: " + e.getMessage());
                 }
             }).start();
@@ -54,7 +53,15 @@ public class DownloadService {
             try (InputStream processOut = process.getInputStream()) {
                 byte[] buffer = new byte[8192];
                 int bytesRead;
+                boolean firstChunkLogged = false; // флаг для первого пакета
                 while ((bytesRead = processOut.read(buffer)) != -1) {
+
+                    if (!firstChunkLogged) {
+                        System.out.println("[DownloadService] ▶️ Поток запущен, пошли первые байты от yt-dlp (" + bytesRead + " байт)");
+
+                        firstChunkLogged = true;
+                    }
+
                     try {
                         output.write(buffer, 0, bytesRead);
                         output.flush();
