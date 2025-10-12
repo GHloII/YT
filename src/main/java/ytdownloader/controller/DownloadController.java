@@ -13,7 +13,8 @@ import ytdownloader.model.VideoInfo;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-import static ytdownloader.model.TaskStatus.PROCESSING;
+
+import static ytdownloader.model.TaskStatus.PROCESSINGB;
 
 @RestController
 public class DownloadController {
@@ -38,7 +39,9 @@ public class DownloadController {
             @RequestParam(required = false) Long size,
             HttpServletResponse response
     ) throws IOException {
-         DownloadTask task = new DownloadTask(taskId,url,PROCESSING);
+         DownloadTask task = new DownloadTask(taskId,url,PROCESSINGB);
+// TODO: проверить сделать проверку всего на null
+// TODO: логика такс айди чтобы нельзя по одному айди скачивать 2 юрл хотябы статус проверять просто
         if (!taskRedisService.taskExists(taskId)) {
             return ResponseEntity.badRequest().body("taskId isnt exist");
         }else{
@@ -53,13 +56,15 @@ public class DownloadController {
             return ResponseEntity.badRequest().body("URL is not trusted");
         }
 
+        if (audioId == null || audioId.isEmpty()){
+            return ResponseEntity.badRequest().body("audioId == null or audioId.isEmpty");
+        }
+
         if (audioId.isEmpty() && videoId.isEmpty()){
             audioId = "bestaudio";
             videoId = "bestvideo";
         }
-        if (audioId == null || audioId.isEmpty()){
-            return ResponseEntity.badRequest().body("audioId == null or audioId.isEmpty");
-        }
+
 
         response.setContentType("video/mp4");
         response.setHeader("Content-Disposition", "attachment; filename=\"video.mp4\"");
