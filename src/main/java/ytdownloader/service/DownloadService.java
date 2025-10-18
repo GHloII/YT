@@ -27,8 +27,6 @@ public class DownloadService {
                     url
             );
 
-
-
             process = builder.start(); // Сначала запускаем процесс
 
             // Создаем финальную копию process для использования в лямбде
