@@ -2,7 +2,8 @@ package ytdownloader.model;
 
 public enum TaskStatus {
     PENDING("pending"),
-    PROCESSING("processing"),
+    PROCESSINGB("processing"),
+    STREAMING("streaming"),
     COMPLETED("completed"),
     FAILED("failed");
     
