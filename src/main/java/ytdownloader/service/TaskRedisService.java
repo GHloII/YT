@@ -52,6 +52,11 @@ public class TaskRedisService {
         redisTemplate.opsForHash().put(taskKey, "status", task.status().getValue());
     }
 
+    public void updateTaskStatus(DownloadTask task,TaskStatus status) {
+        String taskKey = TASK_PREFIX + task.id();
+        redisTemplate.opsForHash().put(taskKey, "status", status.getValue());
+    }
+
     
     // Получаем только статус задачи
     public TaskStatus getTaskStatus(String taskId) {
