@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import ytdownloader.model.DownloadTask;
+import ytdownloader.model.TaskStatus;
 import ytdownloader.service.DownloadService;
 import ytdownloader.service.TaskRedisService;
 import ytdownloader.service.UrlValidator;
@@ -21,12 +22,9 @@ public class DownloadController {
 
     private final DownloadService downloadService;
     private final TaskRedisService taskRedisService;
-    // private final VideoInfoService videoInfoService;
-    // private VideoInfo video;
 
     public DownloadController(DownloadService downloadService, VideoInfoService videoInfoService, TaskRedisService taskRedisService) {
         this.downloadService = downloadService;
-        // this.videoInfoService = videoInfoService;
         this.taskRedisService = taskRedisService;
     }
 
@@ -39,13 +37,14 @@ public class DownloadController {
             @RequestParam(required = false) Long size,
             HttpServletResponse response
     ) throws IOException {
-         DownloadTask task = new DownloadTask(taskId,url,PROCESSINGB);
-// TODO: проверить сделать проверку всего на null
+// TODO: проверить сделать проверку всего на null и либо вынести либо отдельным бином валидировать
 // TODO: логика такс айди чтобы нельзя по одному айди скачивать 2 юрл хотябы статус проверять просто
-        if (!taskRedisService.taskExists(taskId)) {
+
+        DownloadTask task = taskRedisService.getTask(taskId);
+        if (task == null && task.status()!=PROCESSINGB) {
             return ResponseEntity.badRequest().body("taskId isnt exist");
         }else{
-            taskRedisService.updateTaskStatus(task);
+            taskRedisService.updateTaskStatus(task, PROCESSINGB);
         }
 
         if (url.isEmpty()) {
@@ -79,7 +78,7 @@ public class DownloadController {
 
         // Потоковая передача
         try {
-            downloadService.streamVideo(url, videoId, audioId, response.getOutputStream()); // Передаем ID форматов
+            downloadService.streamVideo(url,taskId, videoId, audioId, response.getOutputStream()); // Передаем ID форматов
             return ResponseEntity.ok("well cum.");
         } catch (IOException e) {
             if (!e.getMessage().contains("Broken pipe")) {

@@ -1,15 +1,28 @@
 package ytdownloader.service;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import ytdownloader.model.DownloadTask;
+import ytdownloader.model.TaskStatus;
+
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
+import static ytdownloader.model.TaskStatus.PROCESSINGB;
+
 @Service
 public class DownloadService {
 
-    public void streamVideo(String url, String videoId, String audioId, OutputStream output) throws IOException {
+    private final TaskRedisService taskRedisService;
+
+    public DownloadService(TaskRedisService taskRedisService) {
+        this.taskRedisService = taskRedisService;
+    }
+
+
+    public void streamVideo(String url,String taskId, String videoId, String audioId, OutputStream output) throws IOException {
         Process process = null;
         try {
 
@@ -56,7 +69,13 @@ public class DownloadService {
 
                     if (!firstChunkLogged) {
                         System.out.println("[DownloadService] ▶️ Поток запущен, пошли первые байты от yt-dlp (" + bytesRead + " байт)");
-
+                        DownloadTask task = taskRedisService.getTask(taskId);
+                        if (task == null) {
+                            //return ResponseEntity.badRequest().body("taskId isnt exist");
+                            System.err.println("task == null");
+                        }else{
+                            taskRedisService.updateTaskStatus(task, TaskStatus.STREAMING);
+                        }
                         firstChunkLogged = true;
                     }
 
