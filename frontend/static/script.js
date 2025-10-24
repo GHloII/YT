@@ -1,4 +1,4 @@
-function optionFromValueAndLabel(value,label) {
+function optionFromValueAndLabel(value, label) {
     return `<option value=${value}>${label}</option>`
 }
 
@@ -28,8 +28,8 @@ const videoInfoElement = (imageLink, videoLink, videoTitle, qualityOptions, vide
                 <p class="video-author">${videoAuthor}</p>
             </div>
             <div class="download-controls">
-                <select class="quality-select download-control">
-                ${qualityOptions.map(opt => optionFromValueAndLabel(opt.id, opt.name))}
+                <select class="quality-select download-control" aria-label="Качество видео">
+                ${qualityOptions.map(opt => optionFromValueAndLabel(opt.id, opt.name)).join('')}
                 </select>
                 <button class="download-control download-button" onclick="downloadVideo()">
                     Скачать
@@ -63,7 +63,7 @@ function videoIdByYoutubeUrl(url) {
         return parsed.searchParams.get('v')
     }
     return parsed.pathname.slice(1)
-    
+
 }
 
 function videoInfo(youtubeVideoId) {
@@ -73,17 +73,27 @@ function currentLinkInInput() {
     return mainVideoLinkInput.value
 }
 
+async function eventsSSESource(taskId) {
+    const params = new URLSearchParams({ taskId })
+    const source = new EventSource(`/events?${params}`)
+    source.addEventListener("heartbeat", event => { console.log("💓 Heartbeat:", event.data) })
+    source.addEventListener("taskUpdate", event => { console.log("✅ Task update:", event.data)})
+    return source
+}
+
 async function downloadVideo() {
     const taskId = (await (await fetch('/getDownloadID')).json()).taskId
+
+    const SSESource = await eventsSSESource(taskId)
+
     const params = new URLSearchParams({
         url: mainVideoLinkInput.value,
         videoId: qualitySelect().value,
-        taskId:taskId,
-        audioId:'bestaudio'
+        taskId: taskId,
+        audioId: 'bestaudio'
     })
     const a = document.createElement('a')
     a.href = `/download?${params}`
-    console.log(a.href)
     a.download = ``
     document.body.appendChild(a)
     a.click()
@@ -94,9 +104,9 @@ async function downloadVideo() {
 mainVideoLinkInput.addEventListener('input', () => {
     const videoLink = mainVideoLinkInput.value
     getVideoInfo(videoLink).then((res) => {
-        const {thumbnail, resolutions, title, idByQualityName} = res
+        const { thumbnail, resolutions, title, idByQualityName } = res
         if (thumbnail == undefined || resolutions == undefined || title == undefined || idByQualityName == undefined) {
-            throw new Error('no for this url')
+            throw new Error('no video info for this url')
         }
         videoInfoContainer.innerHTML = videoInfoElement(thumbnail, videoLink, title, qualityNameIdPairs(idByQualityName))
     })
