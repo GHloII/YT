@@ -25,7 +25,7 @@ const videoInfoElement = (imageLink, videoLink, videoTitle, qualityOptions, vide
                         ${videoTitle}
                     </h1>
                 </a>
-                <p class="video-author">${videoAuthor}</p>
+                <p class="video-author">${videoAuthor ?? ''}</p>
             </div>
             <div class="download-controls">
                 <select class="quality-select download-control">
