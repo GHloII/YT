@@ -27,7 +27,7 @@ RUN apt-get update && apt-get install -y \
     ffmpeg \
     --no-install-recommends && \
     rm -rf /var/lib/apt/lists/* && \
-    pip3 install yt-dlp --break-system-packages
+    pip3 install --no-cache-dir -U yt-dlp --break-system-packages
 
 COPY --from=builder /app/target/youtube-downloader-0.0.1-SNAPSHOT.jar app.jar
 

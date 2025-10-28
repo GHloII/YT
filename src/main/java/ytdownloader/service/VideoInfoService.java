@@ -11,6 +11,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -26,34 +27,32 @@ public class VideoInfoService {
         try {
             ProcessBuilder builder = new ProcessBuilder(
                     "yt-dlp",
-                    "--dump-json", // Изменяем на dump-json для получения метаданных
+                    "--dump-json", // Получение чистого JSON без отладочного вывода
                     url
             );
+            // Не смешиваем потоки: stderr отдельно от stdout
 
             process = builder.start(); // Инициализируем process
-            final Process lambdaProcess = process; // Создаем финальную копию для лямбды
-            // Читаем stdout yt-dlp для получения JSON
-            StringBuilder output = new StringBuilder();
-            try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
+            // Читаем stdout (JSON) полностью
+            String jsonOutput;
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream(), StandardCharsets.UTF_8))) {
+                StringBuilder output = new StringBuilder();
                 String line;
                 while ((line = reader.readLine()) != null) {
-                    output.append(line);
+                    output.append(line).append('\n');
                 }
+                jsonOutput = output.toString();
             }
-
-            // Отдельный поток для чтения stderr, чтобы избежать блокировки буфера
-            final StringJoiner errorOutput = new StringJoiner("\n"); // Используем StringJoiner
-            new Thread(() -> {
-                try (InputStream errorStream = lambdaProcess.getErrorStream()) { // Используем lambdaProcess
-                    BufferedReader errorReader = new BufferedReader(new InputStreamReader(errorStream));
-                    String errorLine;
-                    while ((errorLine = errorReader.readLine()) != null) {
-                        errorOutput.add(errorLine); // Добавляем строку в StringJoiner
-                    }
-                } catch (IOException e) {
-                    System.err.println("Ошибка чтения stderr: " + e.getMessage());
+            // Читаем stderr полностью
+            String errorText;
+            try (BufferedReader errReader = new BufferedReader(new InputStreamReader(process.getErrorStream(), StandardCharsets.UTF_8))) {
+                StringBuilder err = new StringBuilder();
+                String eline;
+                while ((eline = errReader.readLine()) != null) {
+                    err.append(eline).append('\n');
                 }
-            }).start();
+                errorText = err.toString();
+            }
 
             int exitCode = 0;
             try {
@@ -64,11 +63,17 @@ public class VideoInfoService {
             }
 
             if (exitCode != 0) {
-                throw new IOException("yt-dlp завершился с ошибкой, код: " + exitCode + ". Ошибка: " + errorOutput.toString()); // Читаем из StringJoiner
+                String errSnippet = errorText.length() > 4000 ? errorText.substring(0, 4000) + "..." : errorText;
+                throw new IOException("yt-dlp завершился с ошибкой, код: " + exitCode + ". stderr:\n" + errSnippet);
             }
 
             // Парсим JSON вывод yt-dlp
-            JsonNode jsonNode = objectMapper.readTree(output.toString());
+            String trimmed = jsonOutput.trim();
+            if (!trimmed.startsWith("{")) {
+                String outSnippet = trimmed.length() > 4000 ? trimmed.substring(0, 4000) + "..." : trimmed;
+                throw new IOException("yt-dlp не вернул JSON. stdout:\n" + outSnippet);
+            }
+            JsonNode jsonNode = objectMapper.readTree(trimmed);
 
             // Извлекаем данные и создаем объект VideoInfo
             String filename = jsonNode.has("id") ? jsonNode.get("id").asText() : "unknown";
