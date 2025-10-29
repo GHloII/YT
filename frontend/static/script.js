@@ -10,7 +10,7 @@ function qualityNameIdPairs(qualityIdByName) {
 }
 
 
-const videoInfoElement = (imageLink, videoLink, videoTitle, qualityOptions, videoAuthor) => `
+const videoInfoElement = (imageLink, videoLink, videoTitle, qualityOptions, videoAuthor, audioId) => `
     <div class="video-info">
         <div class="video-preview">
             <img src="${imageLink}" class="video-preview-image" />
@@ -31,7 +31,7 @@ const videoInfoElement = (imageLink, videoLink, videoTitle, qualityOptions, vide
                 <select class="quality-select download-control" aria-label="Качество видео">
                 ${qualityOptions.map(opt => optionFromValueAndLabel(opt.id, opt.name)).join('')}
                 </select>
-                <button class="download-control download-button" onclick="downloadVideo()">
+                <button class="download-control download-button" onclick="downloadVideo(${audioId})">
                     Скачать
                 </button>
             </div>
@@ -66,9 +66,6 @@ function videoIdByYoutubeUrl(url) {
 
 }
 
-function videoInfo(youtubeVideoId) {
-}
-
 function currentLinkInInput() {
     return mainVideoLinkInput.value
 }
@@ -81,7 +78,8 @@ async function eventsSSESource(taskId) {
     return source
 }
 
-async function downloadVideo() {
+// TODO: add args for all params
+async function downloadVideo(audioId) {
     const taskId = (await (await fetch('/getDownloadID')).json()).taskId
 
     const SSESource = await eventsSSESource(taskId)
@@ -90,7 +88,7 @@ async function downloadVideo() {
         url: mainVideoLinkInput.value,
         videoId: qualitySelect().value,
         taskId: taskId,
-        audioId: 'bestaudio'
+        audioId: audioId
     })
     const a = document.createElement('a')
     a.href = `/download?${params}`
@@ -104,10 +102,10 @@ async function downloadVideo() {
 mainVideoLinkInput.addEventListener('input', () => {
     const videoLink = mainVideoLinkInput.value
     getVideoInfo(videoLink).then((res) => {
-        const { thumbnail, resolutions, title, idByQualityName } = res
+        const { thumbnail, resolutions, title, idByQualityName , videoAuthor, audioId} = res
         if (thumbnail == undefined || resolutions == undefined || title == undefined || idByQualityName == undefined) {
             throw new Error('no video info for this url')
         }
-        videoInfoContainer.innerHTML = videoInfoElement(thumbnail, videoLink, title, qualityNameIdPairs(idByQualityName))
+        videoInfoContainer.innerHTML = videoInfoElement(thumbnail, videoLink, title, qualityNameIdPairs(idByQualityName), videoAuthor, audioId )
     })
 })
