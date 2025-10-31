@@ -39,8 +39,6 @@ const videoInfoElement = (imageLink, videoLink, videoTitle, qualityOptions, vide
     </div>
     `
 
-const mainVideoLinkInput = document.getElementById('main-video-link-input')
-const videoInfoContainer = document.getElementById('video-info-container')
 const qualitySelect = () => document.getElementsByClassName('quality-select')[0]
 
 async function getVideoInfo(videoURL) {
