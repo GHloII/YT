@@ -17,7 +17,7 @@ module.exports = {
         "port": 3001
     },
     "port": 3000,
-    "files": ["frontend/static/**/*"],
+    "files": ["../static/**/*"],
     "watch": true,
     "single": false,
     "watchOptions": {
@@ -25,6 +25,6 @@ module.exports = {
     },
     "server": false,
     "proxy": "http://localhost:80",
-    "serveStatic": ["../frontend/static"],
+    "serveStatic": ["../static"],
     "minify": false,
 };
