@@ -75,7 +75,7 @@ async function eventsSSESource(taskId) {
     const params = new URLSearchParams({ taskId })
     const source = new EventSource(`/events?${params}`)
     source.addEventListener("heartbeat", event => { console.log("💓 Heartbeat:", event.data) })
-    source.addEventListener("taskUpdate", event => { console.log("✅ Task update:", event.data)})
+    source.addEventListener("taskUpdate", event => { console.log("✅ Task update:", event.data) })
     return source
 }
 
@@ -100,11 +100,18 @@ async function downloadVideo() {
 
 
 mainVideoLinkInput.addEventListener('input', () => {
-    const videoLink = mainVideoLinkInput.value
+    const videoLink = mainVideoLinkInput.value.trim()
+    videoInfoContainer.innerHTML = `<div class='skeleton'></div>`
     getVideoInfo(videoLink).then((res) => {
         const { thumbnail, resolutions, title, idByQualityName } = res
         if (thumbnail == undefined || resolutions == undefined || title == undefined || idByQualityName == undefined) {
-            throw new Error('no video info for this url')
+            if (videoLink == '') {
+                videoInfoContainer.innerHTML = ''
+            }
+            else {
+                videoInfoContainer.innerHTML = `<h1>Ничего неизвестно про видео по этой ссылке</h1>`
+                throw new Error('no video info for this url')
+            }
         }
         videoInfoContainer.innerHTML = videoInfoElement(thumbnail, videoLink, title, qualityNameIdPairs(idByQualityName))
     })
