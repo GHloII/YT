@@ -31,13 +31,11 @@ public class TaskRedisService {
     // Получаем полную задачу из Hash
     public DownloadTask getTask(String taskId) {
         String taskKey = TASK_PREFIX + taskId;
-        
-        String url = (String) redisTemplate.opsForHash().get(taskKey, "url");
-        String statusValue = (String) redisTemplate.opsForHash().get(taskKey, "status");
-        
-        if (url == null) {
+        if (!taskExists(taskId)) {
             return null;
         }
+        String url = (String) redisTemplate.opsForHash().get(taskKey, "url");
+        String statusValue = (String) redisTemplate.opsForHash().get(taskKey, "status");
         
         TaskStatus status = TaskStatus.fromString(statusValue);
         return new DownloadTask(taskId, url, status);
@@ -52,6 +50,11 @@ public class TaskRedisService {
     public void updateTaskStatus(DownloadTask task) {
         String taskKey = TASK_PREFIX + task.id();
         redisTemplate.opsForHash().put(taskKey, "status", task.status().getValue());
+    }
+
+    public void updateTaskStatus(DownloadTask task,TaskStatus status) {
+        String taskKey = TASK_PREFIX + task.id();
+        redisTemplate.opsForHash().put(taskKey, "status", status.getValue());
     }
 
     
