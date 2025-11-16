@@ -9,6 +9,15 @@ function qualityNameIdPairs(qualityIdByName) {
     }))
 }
 
+function thisOptionShouldBeSelectedAmongQualityOptions(qualityOptions, option) {
+    if (qualityOptions.map(qualityOption => qualityOption.name).includes('1080p')) {
+        if (option.name == '1080p') {
+            return true
+        }
+        return false
+    }
+}
+
 
 const videoInfoElement = (imageLink, videoLink, videoTitle, qualityOptions, videoAuthor) => `
     <div class="video-info">
@@ -31,7 +40,10 @@ const videoInfoElement = (imageLink, videoLink, videoTitle, qualityOptions, vide
             ${
                 qualityOptions && qualityOptions.length > 0 ?
                 `<select class="quality-select download-control" aria-label="Качество видео">
-                ${qualityOptions.map(opt => optionFromValueAndLabel(opt.id, opt.name)).join('')}
+                    ${
+                        qualityOptions.map(opt => `<option value="${opt.id}" ${ thisOptionShouldBeSelectedAmongQualityOptions(qualityOptions, opt) ? 'selected' : ''}
+                        > ${opt.name} </option>`).join('')
+                    }
                 </select>`
             : ''} 
                 <button class="download-control download-button" onclick="downloadVideo()">
