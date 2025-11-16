@@ -9,8 +9,8 @@ public class UrlValidator {
 
     private static final List<String> TRUSTED_DOMAINS = Arrays.asList(
             "youtube.com",
-            "youtu.be",
-            "soundcloud.com"
+            "youtu.be"
+            /* "soundcloud.com" */
     );
 
     public static boolean isTrusted(String url) {
