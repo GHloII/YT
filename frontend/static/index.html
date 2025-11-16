@@ -106,13 +106,17 @@
                 @media (width <= 600px) {
                     width: 100%;
                 }
+                font-size: 1rem;
+                border: none;
+            }
+
+
+            .download-control, .skeleton{
                 border-radius: 3px;
                 @supports (corner-shape: squircle) {
                     corner-shape: squircle;
                     border-radius: 10px;
                 }
-                font-size: 1rem;
-                border: none;
             }
 
             select {
@@ -138,11 +142,28 @@
                 text-decoration: none;
                 color: var(--text-color);
             }
+
+
+
+            .skeleton {
+                background: #eee;
+                height: 100%;
+                animation: pulse 1.5s infinite;
+                display:block;
+                flex-grow: 1;
+            }
+
+            @keyframes pulse {
+                0% { opacity: 1; }
+                50% { opacity: 0.1; }
+                100% { opacity: 1; }
+            }
         </style>
     </head>
     <body>
         <div class="video-and-input-container">
-            <div id="videoInfoContainer"></div>
+            <div id="videoInfoContainer">
+            </div>
             <div class="mainVideoLinkInput-container">
                 <input
                     id="mainVideoLinkInput"
