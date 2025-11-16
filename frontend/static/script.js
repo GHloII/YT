@@ -6,18 +6,8 @@ function qualityNameIdPairs(qualityIdByName) {
     return Object.entries(qualityIdByName).map(pair => ({
         name: pair[0],
         id: pair[1]
-    }))
+    })).sort((a, b) => parseInt(b.name) - parseInt(a.name))
 }
-
-function thisOptionShouldBeSelectedAmongQualityOptions(qualityOptions, option) {
-    if (qualityOptions.map(qualityOption => qualityOption.name).includes('1080p')) {
-        if (option.name == '1080p') {
-            return true
-        }
-        return false
-    }
-}
-
 
 const videoInfoElement = (imageLink, videoLink, videoTitle, qualityOptions, videoAuthor) => `
     <div class="video-info">
@@ -40,10 +30,10 @@ const videoInfoElement = (imageLink, videoLink, videoTitle, qualityOptions, vide
             ${
                 qualityOptions && qualityOptions.length > 0 ?
                 `<select class="quality-select download-control" aria-label="Качество видео">
-                    ${
-                        qualityOptions.map(opt => `<option value="${opt.id}" ${ thisOptionShouldBeSelectedAmongQualityOptions(qualityOptions, opt) ? 'selected' : ''}
-                        > ${opt.name} </option>`).join('')
-                    }
+                ${ qualityOptions.map(opt => 
+                       `<option value="${opt.id}" ${ parseInt(opt.name) == 1080 ? 'selected' : ''} > ${opt.name} </option>`
+                   ).join('') 
+                }
                 </select>`
             : ''} 
                 <button class="download-control download-button" onclick="downloadVideo()">
