@@ -28,9 +28,12 @@ const videoInfoElement = (imageLink, videoLink, videoTitle, qualityOptions, vide
                 <p class="video-author">${videoAuthor ?? ''}</p>
             </div>
             <div class="download-controls">
-                <select class="quality-select download-control" aria-label="Качество видео">
+            ${
+                qualityOptions && qualityOptions.length > 0 ?
+                `<select class="quality-select download-control" aria-label="Качество видео">
                 ${qualityOptions.map(opt => optionFromValueAndLabel(opt.id, opt.name)).join('')}
-                </select>
+                </select>`
+            : ''} 
                 <button class="download-control download-button" onclick="downloadVideo()">
                     Скачать
                 </button>
