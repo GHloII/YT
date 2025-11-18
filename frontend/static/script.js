@@ -1,12 +1,12 @@
-function optionFromValueAndLabel(value, label) {
-    return `<option value=${value}>${label}</option>`
-}
-
 function qualityNameIdPairs(qualityIdByName) {
     return Object.entries(qualityIdByName).map(pair => ({
         name: pair[0],
         id: pair[1]
     })).sort((a, b) => parseInt(b.name) - parseInt(a.name))
+}
+
+function videoLinkOfCurrentPreview() {
+    return videoTitleLink.href
 }
 
 const videoInfoElement = (imageLink, videoLink, videoTitle, qualityOptions, videoAuthor) => `
@@ -18,6 +18,7 @@ const videoInfoElement = (imageLink, videoLink, videoTitle, qualityOptions, vide
             <div class="video-title-and-author-name">
                 <a
                     class="video-title-link"
+                    id="videoTitleLink"
                     href="${videoLink}"
                 >
                     <h1 class="video-title">
@@ -27,18 +28,14 @@ const videoInfoElement = (imageLink, videoLink, videoTitle, qualityOptions, vide
                 <p class="video-author">${videoAuthor ?? ''}</p>
             </div>
             <div class="download-controls">
-            ${
-                qualityOptions && qualityOptions.length > 0 ?
-                `<select class="quality-select download-control" aria-label="Качество видео">
-                ${ qualityOptions.map(opt => 
-                       `<option value="${opt.id}" ${ parseInt(opt.name) == 1080 ? 'selected' : ''} > ${opt.name} </option>`
-                   ).join('') 
-                }
+            ${qualityOptions && qualityOptions.length > 0 ?
+        `<select class="quality-select download-control" aria-label="Качество видео">
+                ${qualityOptions.map(opt =>
+            `<option value="${opt.id}" ${parseInt(opt.name) == 1080 ? 'selected' : ''} > ${opt.name} </option>`
+        ).join('')
+        }
                 </select>`
-            : ''} 
-                <button class="download-control download-button" onclick="downloadVideo()">
-                    Скачать
-                </button>
+        : ''} 
             </div>
         </div>
     </div>
@@ -69,8 +66,6 @@ function videoIdByYoutubeUrl(url) {
 
 }
 
-function videoInfo(youtubeVideoId) {
-}
 
 function currentLinkInInput() {
     return mainVideoLinkInput.value
@@ -84,13 +79,19 @@ async function eventsSSESource(taskId) {
     return source
 }
 
-async function downloadVideo() {
+async function downloadVideo(url) {
+    downloadButton.classList.add('button-loading')
     const taskId = (await (await fetch('/getDownloadID')).json()).taskId
 
     const SSESource = await eventsSSESource(taskId)
+    SSESource.addEventListener('taskUpdate', event => {
+        if (event.data == 'STREAMING') {
+            downloadButton.classList.remove('button-loading')
+        }
+    })
 
     const params = new URLSearchParams({
-        url: mainVideoLinkInput.value,
+        url,
         videoId: qualitySelect().value,
         taskId: taskId,
         audioId: 'bestaudio'
@@ -103,9 +104,51 @@ async function downloadVideo() {
     document.body.removeChild(a)
 }
 
+function buttonWithId(id, premadeButton) {
+    const b = premadeButton ?? document.createElement('button')
+    b.id = id
+    return b
+}
 
-mainVideoLinkInput.addEventListener('input', () => {
-    const videoLink = mainVideoLinkInput.value.trim()
+function buttonWithEventListener(functionOnClick, premadeButton) {
+    const b = premadeButton ?? document.createElement('button')
+    b.addEventListener('click', functionOnClick)
+    return b
+}
+
+function buttonWithText(text, premadeButton) {
+    const b = premadeButton ?? document.createElement('button')
+    b.innerText = text
+    return b
+}
+
+function pasteButtonWithEventListener() {
+    return buttonWithId('pasteButton',
+        buttonWithText('Вставить',
+            buttonWithEventListener(async () => {
+                changeMainVideoLinkInputValue(await navigator.clipboard.readText())
+            })))
+}
+
+function clearButtonWithEventListener() {
+    return buttonWithId('clearButton',
+        buttonWithText('Очистить',
+            buttonWithEventListener(() => {
+                changeMainVideoLinkInputValue('')
+            })))
+}
+
+
+function onLinkInputChange() {
+    downloadButton.disabled = true
+    const inputValue = mainVideoLinkInput.value
+
+    pasteButtonClearButtonArea.replaceChildren(
+        inputValue == ''
+            ? pasteButtonWithEventListener(mainVideoLinkInput)
+            : clearButtonWithEventListener(mainVideoLinkInput))
+
+    const videoLink = inputValue.trim()
     videoInfoContainer.innerHTML = `<div class='skeleton'></div>`
     getVideoInfo(videoLink).then((res) => {
         const { thumbnail, resolutions, title, idByQualityName } = res
@@ -119,5 +162,19 @@ mainVideoLinkInput.addEventListener('input', () => {
             }
         }
         videoInfoContainer.innerHTML = videoInfoElement(thumbnail, videoLink, title, qualityNameIdPairs(idByQualityName))
+        downloadButton.disabled = false
+        downloadButton.addEventListener('click', () => downloadVideo(videoLinkOfCurrentPreview()))
     })
+}
+
+function changeMainVideoLinkInputValue(newValue) {
+    mainVideoLinkInput.value = newValue
+    onLinkInputChange()
+}
+
+['change', 'input'].forEach((eventType) => {
+    mainVideoLinkInput.addEventListener(eventType, onLinkInputChange)
 })
+
+
+pasteButton.addEventListener('click', async () => changeMainVideoLinkInputValue(await navigator.clipboard.readText()))
