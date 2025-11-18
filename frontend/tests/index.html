@@ -29,7 +29,9 @@
                 });
                 QUnit.test("video id in pathname with params", (assert) => {
                     assert.equal(
-                        videoIdByYoutubeUrl("https://youtu.be/tk7qTNW5g0c?si=r3mtTefigXMjrzcy"),
+                        videoIdByYoutubeUrl(
+                            "https://youtu.be/tk7qTNW5g0c?si=r3mtTefigXMjrzcy"
+                        ),
                         "tk7qTNW5g0c"
                     );
                 });
