@@ -13,6 +13,7 @@
                 --controls-width: 7.5rem;
                 --primary-color: #ff0033;
                 --text-color: black;
+                --disabled-button-color: rgba(0,0,0, 0.3);
             }
 
             body {
@@ -25,10 +26,21 @@
                 font-family: Inter, sans-serif;
             }
 
+            .mainVideoLinkInput-container {
+                background: rgb(246, 246, 246);
+                font-size:1.2rem;
+                border-radius: 300px;
+                display: flex;
+                flex-direction: row;
+                padding: 0.6rem;
+                align-items: center;
+            }
+
+
             #mainVideoLinkInput {
                 border: none;
+                font-size: inherit;
                 outline: none;
-                font-size: 2rem;
                 font-weight: 400;
                 width: 100%;
                 height: fit-content;
@@ -158,13 +170,53 @@
                 50% { opacity: 0.1; }
                 100% { opacity: 1; }
             }
+
+            #downloadButton, #pasteButton, #clearButton  {
+                flex-direction: row;
+                align-items: baseline;
+                gap: 0.3em;
+                padding:0.3em 0.5em;
+                font-size: inherit;
+                border-radius: 300px;
+                border-width: 0;
+            }
+
+            #downloadButton {
+                display:flex;
+                color:white;
+                background-color: var(--primary-color);
+            }
+
+            #downloadButton:disabled {
+                background-color: transparent;
+                border-color: var(--disabled-button-color);
+                border-width: 1px;
+                border-style: solid;
+                color: var(--disabled-button-color);
+            }
+
+            #downloadButton:disabled #downloadButtonIcon path {
+                fill: var(--disabled-button-color);
+            }
+
+            #downloadButtonIcon {
+                font-size: inherit;
+                height:0.6em;
+                width:0.6em;
+            }
+
+            #linkInputControls {
+                display:flex;
+                flex-direction: row;
+                gap: 0.5em
+            }
         </style>
     </head>
     <body>
         <div class="video-and-input-container">
             <div id="videoInfoContainer">
             </div>
-            <div class="mainVideoLinkInput-container">
+            <div class="mainVideoLinkInput-container" onclick="mainVideoLinkInput.focus()">
                 <input
                     id="mainVideoLinkInput"
                     placeholder="Ссылка на видео"
@@ -172,6 +224,18 @@
                     id="video-url-input"
                     autofocus
                 />
+                <div id="linkInputControls">
+                    <div id="pasteButtonClearButtonArea">
+                        <button id="pasteButton">Вставить</button>
+                    </div>
+                    <button id="downloadButton" disabled>
+                        <span>Скачать</span>
+
+                        <svg  viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg" id="downloadButtonIcon">
+                            <path d="M6.08751 0.912525C6.08751 0.408223 6.49572 0 7 0C7.50428 0 7.91249 0.408223 7.91249 0.912525V11.0751L12.4853 7.0743C12.8646 6.7424 13.4417 6.78007 13.7738 7.15901C14.1057 7.53833 14.068 8.11537 13.6891 8.44754L7.60189 13.7741C7.25763 14.0753 6.74237 14.0753 6.39811 13.7741L0.310882 8.44754C-0.0680404 8.11537 -0.105716 7.53833 0.226172 7.15901C0.558332 6.78007 1.13536 6.7424 1.51466 7.0743L6.08751 11.0751V0.912525Z"/>
+                        </svg>
+                    </button>
+                </div>
             </div>
         </div>
     </body>
