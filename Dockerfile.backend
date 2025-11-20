@@ -15,7 +15,7 @@ COPY src ./src
 RUN mvn clean package -DskipTests
 
 # ----- Final Stage -----
-FROM openjdk:21-jdk-slim
+FROM eclipse-temurin:21-jre-jammy
 
 # Устанавливаем рабочую директорию
 WORKDIR /app
@@ -27,7 +27,7 @@ RUN apt-get update && apt-get install -y \
     ffmpeg \
     --no-install-recommends && \
     rm -rf /var/lib/apt/lists/* && \
-    pip3 install --no-cache-dir -U yt-dlp --break-system-packages
+    pip3 install --no-cache-dir -U yt-dlp
 
 COPY --from=builder /app/target/youtube-downloader-0.0.1-SNAPSHOT.jar app.jar
 
