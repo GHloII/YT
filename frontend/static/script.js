@@ -79,7 +79,7 @@ async function eventsSSESource(taskId) {
     return source
 }
 
-async function downloadVideo(url) {
+async function downloadVideo(url, audioId) {
     downloadButton.classList.add('button-loading')
     const taskId = (await (await fetch('/getDownloadID')).json()).taskId
 
@@ -94,7 +94,7 @@ async function downloadVideo(url) {
         url,
         videoId: qualitySelect().value,
         taskId: taskId,
-        audioId: 'bestaudio'
+        audioId: audioId
     })
     const a = document.createElement('a')
     a.href = `/download?${params}`
@@ -151,7 +151,7 @@ function onLinkInputChange() {
     const videoLink = inputValue.trim()
     videoInfoContainer.innerHTML = `<div class='skeleton'></div>`
     getVideoInfo(videoLink).then((res) => {
-        const { thumbnail, resolutions, title, idByQualityName } = res
+        const { thumbnail, resolutions, title, idByQualityName, audioId } = res
         if (thumbnail == undefined || resolutions == undefined || title == undefined || idByQualityName == undefined) {
             if (videoLink == '') {
                 videoInfoContainer.innerHTML = ''
@@ -163,7 +163,7 @@ function onLinkInputChange() {
         }
         videoInfoContainer.innerHTML = videoInfoElement(thumbnail, videoLink, title, qualityNameIdPairs(idByQualityName))
         downloadButton.disabled = false
-        downloadButton.addEventListener('click', () => downloadVideo(videoLinkOfCurrentPreview()))
+        downloadButton.addEventListener('click', () => downloadVideo(videoLinkOfCurrentPreview(), audioId == '0' ? 'bestaudio' : audioId ))
     })
 }
 
