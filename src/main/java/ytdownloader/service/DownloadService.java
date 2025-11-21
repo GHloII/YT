@@ -41,58 +41,7 @@ public class DownloadService {
             );
 
             process = builder.start(); // Сначала запускаем процесс
-
-            // Создаем финальную копию process для использования в лямбде
-            final Process finalProcessForStderr = process;
-
-            // Отдельный поток для чтения stderr, чтобы избежать блокировки буфера
-            // Это не выводит ошибки в HTTP-ответ, но предотвращает зависание процесса
-            new Thread(() -> {
-                try (InputStream errorStream = finalProcessForStderr.getErrorStream()) {
-                    byte[] buffer = new byte[8192];
-                    int bytesRead;
-                    while ((bytesRead = errorStream.read(buffer)) != -1) {
-                        // Выводим содержимое stderr в System.err для отладки
-                        System.err.write(buffer, 0, bytesRead);
-                    }
-                } catch (IOException e) {
-                    System.err.println("Ошибка чтения stderr: " + e.getMessage());
-                }
-            }).start();
-
-            // Читаем из stdout yt-dlp и стримим в output
-            try (InputStream processOut = process.getInputStream()) {
-                byte[] buffer = new byte[8192];
-                int bytesRead;
-                boolean firstChunkLogged = false; // флаг для первого пакета
-                while ((bytesRead = processOut.read(buffer)) != -1) {
-
-                    if (!firstChunkLogged) {
-                        System.out.println("[DownloadService] ▶️ Поток запущен, пошли первые байты от yt-dlp (" + bytesRead + " байт)");
-                        DownloadTask task = taskRedisService.getTask(taskId);
-                        if (task == null) {
-                            //return ResponseEntity.badRequest().body("taskId isnt exist");
-                            System.err.println("task == null");
-                        }else{
-                            taskRedisService.updateTaskStatus(task, TaskStatus.STREAMING);
-                        }
-                        firstChunkLogged = true;
-                    }
-
-                    try {
-                        output.write(buffer, 0, bytesRead);
-                        output.flush();
-                    } catch (IOException e) {
-                        // Обработка разрыва соединения
-                        throw e;
-                    }
-                }
-            }
-            // Проверяем код завершения yt-dlp после того, как все данные прочитаны
-            int exitCode = process.waitFor();
-            if (exitCode != 0) {
-                throw new IOException("yt-dlp завершился с ошибкой, код: " + exitCode);
-            }
+            handleProcessStreaming(process, taskId, output);
 
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
@@ -101,6 +50,90 @@ public class DownloadService {
             if (process != null && process.isAlive()) {
                 destroyProcess(process);
             }
+        }
+    }
+
+    // TODO: yt-dlp erroutput [infoController]
+    public void streamAudio(String url,String taskId, String audioId, OutputStream output) throws IOException {
+        Process process = null;
+        try {
+
+            ProcessBuilder builder = new ProcessBuilder(
+                    "yt-dlp",
+                    "--quiet",
+                    "--no-progress",
+                    "-f", "bestaudio",
+                    "--extract-audio",
+                    "--audio-format", "mp3",
+                    "-o", "-",
+                    url
+            );
+
+
+            process = builder.start(); // Сначала запускаем процесс
+            handleProcessStreaming(process, taskId, output);
+
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new IOException("Процесс yt-dlp был прерван.", e);
+        } finally {
+            if (process != null && process.isAlive()) {
+                destroyProcess(process);
+            }
+        }
+    }
+
+    private void handleProcessStreaming(Process process, String taskId, OutputStream output) throws IOException, InterruptedException {
+        // Создаем финальную копию process для использования в лямбде
+        final Process finalProcessForStderr = process;
+
+        // Отдельный поток для чтения stderr, чтобы избежать блокировки буфера
+        // Это не выводит ошибки в HTTP-ответ, но предотвращает зависание процесса
+        new Thread(() -> {
+            try (InputStream errorStream = finalProcessForStderr.getErrorStream()) {
+                byte[] buffer = new byte[8192];
+                int bytesRead;
+                while ((bytesRead = errorStream.read(buffer)) != -1) {
+                    // Выводим содержимое stderr в System.err для отладки
+                    System.err.write(buffer, 0, bytesRead);
+                }
+            } catch (IOException e) {
+                System.err.println("Ошибка чтения stderr: " + e.getMessage());
+            }
+        }).start();
+
+        // Читаем из stdout yt-dlp и стримим в output
+        try (InputStream processOut = process.getInputStream()) {
+            byte[] buffer = new byte[8192];
+            int bytesRead;
+            boolean firstChunkLogged = false; // флаг для первого пакета
+            while ((bytesRead = processOut.read(buffer)) != -1) {
+
+                if (!firstChunkLogged) {
+                    System.out.println("[DownloadService] ▶️ Поток запущен, пошли первые байты от yt-dlp (" + bytesRead + " байт)");
+                    DownloadTask task = taskRedisService.getTask(taskId);
+                    if (task == null) {
+                        //return ResponseEntity.badRequest().body("taskId isnt exist");
+                        System.err.println("task == null");
+                    }else{
+                        taskRedisService.updateTaskStatus(task, TaskStatus.STREAMING);
+                    }
+                    firstChunkLogged = true;
+                }
+
+                try {
+                    output.write(buffer, 0, bytesRead);
+                    output.flush();
+                } catch (IOException e) {
+                    // Обработка разрыва соединения
+                    throw e;
+                }
+            }
+        }
+        // Проверяем код завершения yt-dlp после того, как все данные прочитаны
+        int exitCode = process.waitFor();
+        if (exitCode != 0) {
+            throw new IOException("yt-dlp завершился с ошибкой, код: " + exitCode);
         }
     }
 

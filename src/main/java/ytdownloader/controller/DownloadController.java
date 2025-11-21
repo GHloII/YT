@@ -38,7 +38,7 @@ public class DownloadController {
             HttpServletResponse response
     ) throws IOException {
 // TODO: проверить сделать проверку всего на null и либо вынести либо отдельным бином валидировать
-// TODO: логика такс айди чтобы нельзя по одному айди скачивать 2 юрл хотябы статус проверять просто
+
 
         DownloadTask task = taskRedisService.getTask(taskId);
         if (task == null && task.status()!=PROCESSINGB) {
@@ -78,14 +78,22 @@ public class DownloadController {
 
         // Потоковая передача
         try {
-            downloadService.streamVideo(url,taskId, videoId, audioId, response.getOutputStream()); // Передаем ID форматов
+            if (videoId.equals("0")){
+                response.setContentType("audio/mp3");
+                response.setHeader("Content-Disposition", "attachment; filename=\"audio.mp3\"");
+                downloadService.streamAudio(url,taskId, audioId, response.getOutputStream());
+            } else {
+                response.setContentType("video/mp4");
+                response.setHeader("Content-Disposition", "attachment; filename=\"video.mp4\"");
+                downloadService.streamVideo(url, taskId, videoId, audioId, response.getOutputStream()); // Передаем ID форматов
+            }
             return ResponseEntity.ok("well cum.");
         } catch (IOException e) {
             if (!e.getMessage().contains("Broken pipe")) {
                 System.err.println("IOException "+ e);
                 return ResponseEntity.badRequest().body("Broken pipe");
             }
-            // Логировать разрыв соединения (не критичная ошибка)
+
         }
         return null;
     }
