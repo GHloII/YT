@@ -170,7 +170,7 @@ function onLinkInputChange() {
         }
         videoInfoContainer.innerHTML = videoInfoElement(thumbnail, videoLink, title, qualityNameIdPairs(idByQualityName))
         downloadButton.disabled = false
-        downloadButton.addEventListener('click', () => { downloadVideo(videoLinkOfCurrentPreview(), audioId == '0' ? 'bestaudio' : audioId, document.querySelector('input[name="audioOrVideo"][value="video"]:checked') ? qualitySelect().value : 0)})
+        downloadButton.onclick = () => {downloadVideo(videoLinkOfCurrentPreview(), audioId == '0' ? 'bestaudio' : audioId )}
     })
 }
 
@@ -179,7 +179,7 @@ function changeMainVideoLinkInputValue(newValue) {
     onLinkInputChange()
 }
 
-['change', 'input'].forEach((eventType) => {
+['input'].forEach((eventType) => {
     mainVideoLinkInput.addEventListener(eventType, onLinkInputChange)
 })
 
