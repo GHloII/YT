@@ -172,7 +172,7 @@ function changeMainVideoLinkInputValue(newValue) {
     onLinkInputChange()
 }
 
-['change', 'input'].forEach((eventType) => {
+['input'].forEach((eventType) => {
     mainVideoLinkInput.addEventListener(eventType, onLinkInputChange)
 })
 
