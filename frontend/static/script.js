@@ -28,14 +28,21 @@ const videoInfoElement = (imageLink, videoLink, videoTitle, qualityOptions, vide
                 <p class="video-author">${videoAuthor ?? ''}</p>
             </div>
             <div class="download-controls">
-            ${qualityOptions && qualityOptions.length > 0 ?
-        `<select class="quality-select download-control" aria-label="Качество видео">
-                ${qualityOptions.map(opt =>
+            <div id="audioOrVideoRadioButtonGroup">
+            <input type="radio" id="videoRadioButton" name="audioOrVideo" value="video" checked>
+            <label for="videoRadioButton">Видео
+                    ${qualityOptions && qualityOptions.length > 0 ?
+        `с качеством: <select class="quality-select download-control" aria-label="Качество видео">
+                        ${qualityOptions.map(opt =>
             `<option value="${opt.id}" ${parseInt(opt.name) == 1080 ? 'selected' : ''} > ${opt.name} </option>`
         ).join('')
         }
-                </select>`
+                        </select>`
         : ''} 
+            </label>
+            <input type="radio" id="audioRadioButton" name="audioOrVideo" value="audio">
+            <label for="audioRadioButton">Только звук</label>
+            </div>
             </div>
         </div>
     </div>
@@ -79,7 +86,7 @@ async function eventsSSESource(taskId) {
     return source
 }
 
-async function downloadVideo(url, audioId) {
+async function downloadVideo(url, audioId, videoId) {
     downloadButton.classList.add('button-loading')
     const taskId = (await (await fetch('/getDownloadID')).json()).taskId
 
@@ -92,7 +99,7 @@ async function downloadVideo(url, audioId) {
 
     const params = new URLSearchParams({
         url,
-        videoId: qualitySelect().value,
+        videoId: videoId,
         taskId: taskId,
         audioId: audioId
     })
@@ -163,7 +170,7 @@ function onLinkInputChange() {
         }
         videoInfoContainer.innerHTML = videoInfoElement(thumbnail, videoLink, title, qualityNameIdPairs(idByQualityName))
         downloadButton.disabled = false
-        downloadButton.addEventListener('click', () => downloadVideo(videoLinkOfCurrentPreview(), audioId == '0' ? 'bestaudio' : audioId ))
+        downloadButton.addEventListener('click', () => { downloadVideo(videoLinkOfCurrentPreview(), audioId == '0' ? 'bestaudio' : audioId, document.querySelector('input[name="audioOrVideo"][value="video"]:checked') ? qualitySelect().value : 0)})
     })
 }
 
