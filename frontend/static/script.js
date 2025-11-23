@@ -163,7 +163,7 @@ function onLinkInputChange() {
         }
         videoInfoContainer.innerHTML = videoInfoElement(thumbnail, videoLink, title, qualityNameIdPairs(idByQualityName))
         downloadButton.disabled = false
-        downloadButton.addEventListener('click', () => downloadVideo(videoLinkOfCurrentPreview(), audioId == '0' ? 'bestaudio' : audioId ))
+        downloadButton.onclick = () => {downloadVideo(videoLinkOfCurrentPreview(), audioId == '0' ? 'bestaudio' : audioId )}
     })
 }
 
