@@ -27,4 +27,10 @@ module.exports = {
     "proxy": "http://localhost:80",
     "serveStatic": ["../static"],
     "minify": false,
+    snippetOptions: {
+        rule: {
+            match: /<\/script>/i,
+            fn: (snippet, match)=> `${match}\n<script src="/dev-only.js" defer></script>\n${snippet}\n`
+        }
+    }
 };
