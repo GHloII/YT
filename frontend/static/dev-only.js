@@ -1,4 +1,6 @@
+import { videoInfoElement, qualityNameIdPairs} from "/functions.js"
 console.log('dev mode')
+const videoInfoContainer = document.getElementById("videoInfoContainer")
 const { thumbnail, resolutions, title, idByQualityName, audioId } = {
     "title": "replay - pre-commit 4.5.0 - 2025-11-22",
     "resolutions": [

@@ -29,8 +29,8 @@ module.exports = {
     "minify": false,
     snippetOptions: {
         rule: {
-            match: /<\/script>/i,
-            fn: (snippet, match)=> `${match}\n<script src="/dev-only.js" defer></script>\n${snippet}\n`
+            match: /<\/body>/i,
+            fn: (snippet, match) => `${match}\n<script src="/dev-only.js" defer type="module"></script>\n${snippet}\n`
         }
     }
 };
