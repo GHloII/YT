@@ -50,7 +50,16 @@ export async function getVideoInfo(videoURL) {
 
 
 export function videoIdByYoutubeUrl(url) {
-    const parsed = new URL(url)
+    let parsed;
+    try {
+        parsed = new URL(url)
+
+    } catch (e) {
+        if (e instanceof TypeError) {
+            return null
+        }
+        throw e
+    }
 
     const hostname = parsed.hostname.replace(/^www\./, '');
     if (!(hostname === 'youtube.com' || hostname === 'youtu.be' || hostname == 'm.youtube.com')) {
@@ -98,5 +107,5 @@ export async function downloadVideo(url, audioId, videoId) {
 }
 
 export function youtubeUrlById(id) {
-    return `youtu.be/${id}`
+    return `https://youtu.be/${id}`
 }

@@ -1,7 +1,7 @@
 
-import { videoIdByYoutubeUrl, qualityNameIdPairs } from '/functions.js'
+import { videoIdByYoutubeUrl, qualityNameIdPairs, youtubeUrlById } from '/functions.js'
 QUnit.config.autostart = false
-QUnit.module('youtubeUrlTools', function () {
+QUnit.module('videoIdByYoutubeUrl', function () {
     QUnit.test('watch v', (assert) => {
         assert.equal(
             videoIdByYoutubeUrl(
@@ -43,8 +43,15 @@ QUnit.module('youtubeUrlTools', function () {
         )
     })
 
-
+    QUnit.test('gibberish returns null', (assert) => {
+        assert.equal(videoIdByYoutubeUrl('asdfljasdas;lsdkjf'), null)
+    })
 })
+
+QUnit.module('youtubeUrlById', function () {
+    QUnit.test('example', (assert) => assert.equal(youtubeUrlById('dQw4w9WgXcQ'), 'https://youtu.be/dQw4w9WgXcQ'))
+})
+
 
 QUnit.module('qualityNameIdPairs', function () {
     QUnit.test('example', (assert) => {
@@ -67,7 +74,6 @@ QUnit.module('qualityNameIdPairs', function () {
                 { "name": "144p", "id": "278" }
             ]
         )
-
     })
 })
 

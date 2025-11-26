@@ -266,6 +266,9 @@
             getVideoInfo,
             qualityNameIdPairs,
             downloadVideo,
+            videoIdByYoutubeUrl,
+            youtubeUrlById
+
         } from '/functions.js'
 
         function videoLinkOfCurrentPreview() {
@@ -286,7 +289,7 @@
             btn.addEventListener('click', () => {
                 changeMainVideoLinkInputValue('')
             })
-            btn.id='clearButton'
+            btn.id = 'clearButton'
             return btn
         }
 
@@ -298,7 +301,7 @@
                     await navigator.clipboard.readText()
                 )
             })
-            btn.id='pasteButton'
+            btn.id = 'pasteButton'
             return btn
         }
 
@@ -312,7 +315,15 @@
                     : clearButtonWithEventListener(mainVideoLinkInput)
             )
 
-            const videoLink = inputValue.trim()
+            const videoId = videoIdByYoutubeUrl(inputValue.trim())
+            const videoLink = youtubeUrlById(videoId)
+
+            if (!videoId) {
+                videoInfoContainer.innerHTML = ''
+                return
+            }
+
+
             videoInfoContainer.innerHTML = `<div class='skeleton'></div>`
             getVideoInfo(videoLink).then((res) => {
                 const {
@@ -347,7 +358,6 @@
                         videoLinkOfCurrentPreview(),
                         audioId == '0' ? 'bestaudio' : audioId,
                         qualitySelect().value
-
                     )
                 }
             })
