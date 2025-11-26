@@ -3,6 +3,7 @@
     "browser-sync": "^3.0.4"
   },
   "scripts": {
-    "d": "browser-sync start --config bs-config.js"
+    "d": "browser-sync start --config dev-bs-config.js",
+    "test": "browser-sync start --config test-bs-config.js"
   }
 }
