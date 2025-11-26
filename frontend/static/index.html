@@ -286,6 +286,7 @@
             btn.addEventListener('click', () => {
                 changeMainVideoLinkInputValue('')
             })
+            btn.id='clearButton'
             return btn
         }
 
@@ -297,6 +298,7 @@
                     await navigator.clipboard.readText()
                 )
             })
+            btn.id='pasteButton'
             return btn
         }
 
