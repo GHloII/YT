@@ -72,8 +72,6 @@ export function videoIdByYoutubeUrl(url) {
 export async function eventsSSESource(taskId) {
     const params = new URLSearchParams({ taskId })
     const source = new EventSource(`/events?${params}`)
-    source.addEventListener("heartbeat", event => { console.log("💓 Heartbeat:", event.data) })
-    source.addEventListener("taskUpdate", event => { console.log("✅ Task update:", event.data) })
     return source
 }
 
@@ -97,4 +95,8 @@ export async function downloadVideo(url, audioId, videoId) {
     document.body.appendChild(a)
     a.click()
     document.body.removeChild(a)
+}
+
+export function youtubeUrlById(id) {
+    return `youtu.be/${id}`
 }
