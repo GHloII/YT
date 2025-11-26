@@ -1,5 +1,5 @@
 
-import { videoIdByYoutubeUrl } from '/functions.js'
+import { videoIdByYoutubeUrl, qualityNameIdPairs } from '/functions.js'
 QUnit.config.autostart = false
 QUnit.module('youtubeUrlTools', function () {
     QUnit.test('watch v', (assert) => {
@@ -37,13 +37,38 @@ QUnit.module('youtubeUrlTools', function () {
         )
     })
     QUnit.test('shorts url', (assert) => {
-        assert.equal(
+        assert.deepEqual(
             videoIdByYoutubeUrl('https://youtube.com/shorts/t-7ZP09lkIA?si=NiiKCasMbp92EDzL'),
             't-7ZP09lkIA'
         )
     })
-    
 
+
+})
+
+QUnit.module('qualityNameIdPairs', function () {
+    QUnit.test('example', (assert) => {
+        assert.deepEqual(
+            qualityNameIdPairs({
+                "144p": "278",
+                "240p": "242",
+                "360p": "243",
+                "480p": "244",
+                "720p": "247",
+                "1080p": "248"
+            }),
+
+            [
+                { "name": "1080p", "id": "248" },
+                { "name": "720p", "id": "247" },
+                { "name": "480p", "id": "244" },
+                { "name": "360p", "id": "243" },
+                { "name": "240p", "id": "242" },
+                { "name": "144p", "id": "278" }
+            ]
+        )
+
+    })
 })
 
 QUnit.start()
