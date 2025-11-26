@@ -60,8 +60,13 @@ export function videoIdByYoutubeUrl(url) {
     if (parsed.pathname == '/watch' && parsed.searchParams.has('v')) {
         return parsed.searchParams.get('v')
     }
-    return parsed.pathname.slice(1)
+    const splitPathname = parsed.pathname.split('/')
 
+    if (splitPathname[1] == 'shorts') {
+        return splitPathname[2]
+    }
+
+    return parsed.pathname.slice(1)
 }
 
 export async function eventsSSESource(taskId) {
