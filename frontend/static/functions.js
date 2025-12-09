@@ -50,10 +50,10 @@ export async function getVideoInfo(videoURL) {
 
 
 export function videoIdByYoutubeUrl(url) {
+    const urlWithProtocol = url.includes('https://') ? url : 'https://' + url
     let parsed;
     try {
-        parsed = new URL(url)
-
+        parsed = new URL(urlWithProtocol)
     } catch (e) {
         if (e instanceof TypeError) {
             return null
@@ -73,6 +73,9 @@ export function videoIdByYoutubeUrl(url) {
 
     if (splitPathname[1] == 'shorts') {
         return splitPathname[2]
+    }
+    if (splitPathname[1] == 'playlist') {
+        return null
     }
 
     return parsed.pathname.slice(1)

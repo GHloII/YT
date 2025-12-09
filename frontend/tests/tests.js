@@ -10,6 +10,25 @@ QUnit.module('videoIdByYoutubeUrl', function () {
             'dQw4w9WgXcQ'
         )
     })
+
+    QUnit.test('watch v without protocol', (assert) => {
+        assert.equal(
+            videoIdByYoutubeUrl(
+                'www.youtube.com/watch?v=dQw4w9WgXcQ'
+            ),
+            'dQw4w9WgXcQ'
+        )
+    })
+
+    QUnit.test('watch v without protocol and www', (assert) => {
+        assert.equal(
+            videoIdByYoutubeUrl(
+                'youtube.com/watch?v=dQw4w9WgXcQ'
+            ),
+            'dQw4w9WgXcQ'
+        )
+    })
+
     QUnit.test('video id in pathname', (assert) => {
         assert.equal(
             videoIdByYoutubeUrl('https://youtu.be/dQw4w9WgXcQ'),
@@ -46,6 +65,15 @@ QUnit.module('videoIdByYoutubeUrl', function () {
     QUnit.test('gibberish returns null', (assert) => {
         assert.equal(videoIdByYoutubeUrl('asdfljasdas;lsdkjf'), null)
     })
+
+    QUnit.test('playlist link returns null', (assert) => {
+        assert.equal(videoIdByYoutubeUrl('https://www.youtube.com/playlist?list=PLfm28xn9mEJGCkW7MOBN_si04Z7RzHO9E'), null)
+    })
+
+    QUnit.test('playlist link from share button returns null', (assert) => {
+        assert.equal(videoIdByYoutubeUrl('https://youtube.com/playlist?list=PLfm28xn9mEJGCkW7MOBN_si04Z7RzHO9E&si=7lxM2ZJK6fdyLaDB'), null)
+    })
+
 })
 
 QUnit.module('youtubeUrlById', function () {
